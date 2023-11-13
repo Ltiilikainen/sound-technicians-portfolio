@@ -1,9 +1,13 @@
 import React from 'react';
 import './About.css';
+import AudioPlayer from './AudioPlayer/AudioPlayer';
+import testAudio from '../../files/work-audio/funny_sound.mp3';
 
 const About = () => {
+    
     return(
         <div className="container">
+
             <h1>About</h1>
 
             <div className='about-text'>
@@ -14,6 +18,9 @@ const About = () => {
                     Dolore ut et est sunt ipsum duis dolore nostrud aute. Pariatur laborum ex laborum dolore esse incididunt pariatur laboris Lorem irure dolore ullamco. Commodo occaecat duis id ea nostrud aute in. Ut aliquip ad sit adipisicing duis esse ex sunt culpa ad cillum reprehenderit anim. Irure veniam cillum aliqua non sit voluptate duis id in non proident consectetur laborum. Sint labore consectetur velit ad irure occaecat aliqua non.
                 </p>
             </div>
+
+            <h1>Work examples</h1>
+            <AudioPlayer audiopath={testAudio}/>
         </div>
     );
 };
