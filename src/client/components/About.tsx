@@ -1,7 +1,7 @@
 import React from 'react';
 import './About.css';
 import AudioPlayer from './AudioPlayer/AudioPlayer';
-import testAudio from '../../files/work-audio/funny_sound.mp3';
+import testAudio from '../../files/work-audio/soft-piano-100-bpm-121529.mp3';
 
 const About = () => {
     
