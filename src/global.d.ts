@@ -4,3 +4,9 @@ interface IFile {
     path: string,
     tag: string
 }
+
+interface IWorkExample {
+    _id: string,
+    file: IFile,
+    occasions: string
+}

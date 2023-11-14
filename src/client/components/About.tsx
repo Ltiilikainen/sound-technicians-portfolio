@@ -1,9 +1,16 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './About.css';
 import AudioPlayer from './AudioPlayer/AudioPlayer';
-import testAudio from '../../files/work-audio/soft-piano-100-bpm-121529.mp3';
+import dbServices from '../dbServices';
 
 const About = () => {
+    const [audioFiles, setAudioFiles] = useState(Array<IWorkExample>);
+
+    useEffect(() => {
+        dbServices.getWorkAudio()
+            .then(fileList => {
+                setAudioFiles(fileList);});
+    }, []);
     
     return(
         <div className="container">
@@ -19,8 +26,29 @@ const About = () => {
                 </p>
             </div>
 
+            <div className='rates'>
+                <h1>My rates</h1>
+                <p><span className='prices'>18€/h</span>Lorem ipsum</p>
+                <p><span className='prices'>18€/h</span>Lorem ipsum</p>
+                <p><span className='prices'>18€/h</span>Lorem ipsum</p>
+                <p><span className='prices'>18€/h</span>Lorem ipsum</p>
+            </div>
+
             <h1>Work examples</h1>
-            <AudioPlayer audiopath={testAudio}/>
+            { audioFiles.map(file => 
+            {
+                return (
+                    <div key={file._id} className='row row-cols-md-2'>
+                        <div className='col col-md-7'>
+                            <AudioPlayer audiopath={`../../${file.file.path}`}/>
+                        </div>
+                        <div className='col col-md-5 text-start pt-3'>
+                            <h3>Occasion</h3>
+                            <p>{file.occasions}</p>
+                        </div>
+                    </div>
+                );}
+            )}
         </div>
     );
 };

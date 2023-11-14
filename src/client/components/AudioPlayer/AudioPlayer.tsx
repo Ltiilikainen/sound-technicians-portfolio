@@ -27,9 +27,8 @@ const AudioPlayer = ({audiopath}: AudioPlayerProps) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [trackState, setTrackState] = useState<TrackState>({trackDuration: null, playbackPosition: null});
     const [progress, setProgress] = useState(0);
-    //const pathArray = audiopath.split(['/ .']);
-
-    const fileName = 'audio';
+    const pathArray = audiopath.split(/[/ .]/);
+    const fileName = pathArray[pathArray.length-2];
 
     const audioRef = useRef<HTMLAudioElement>(null);
     const progressRef = useRef<HTMLInputElement>(null);

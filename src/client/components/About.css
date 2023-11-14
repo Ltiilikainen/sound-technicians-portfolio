@@ -4,3 +4,17 @@ h1 {
 .about-text {
     text-align: left;
 }
+
+.rates {
+    text-align: left;
+}
+
+.rates p {
+    padding: 0.2em 0 0.2em 0.4em;
+}
+
+.rates span {
+    padding-right: 0.6em;
+    font-size: 1.2em;
+    font-weight: 600;
+}

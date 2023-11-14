@@ -1,7 +1,7 @@
 import express from 'express';
 import ViteExpress from 'vite-express';
 import dbConnectors from './Middleware/dbConnectors';
-import uploads from './Schemas/uploads';
+import work_examples from './Schemas/work_examples';
 
 const app = express();
 
@@ -9,7 +9,8 @@ app.get('/api/work-audio', (_, res) => {
     dbConnectors.connectReader()
         .catch(e => console.log(e))
         .then(() => {
-            uploads.find().selectAudio().where({path:  {'$regex': 'work-audio', '$options': 'i'}})
+            work_examples.find()
+                .populate('file')
                 .catch(e => console.log(e.message))
                 .then(workAudio => 
                 {

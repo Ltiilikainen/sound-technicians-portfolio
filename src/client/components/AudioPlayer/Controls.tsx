@@ -12,6 +12,7 @@ type ControlsProps = {
 };
 
 const Controls = ({isPlaying, onPlayPauseClick, onStopClick}: ControlsProps) => {
+    const fileName = useContext(audioContext).fileName;
     const audioRef = useContext(audioContext).audioRef;
     const setProgress = useContext(audioContext).setProgress;
     const progressRef = useContext(audioContext).progressRef;
@@ -41,13 +42,13 @@ const Controls = ({isPlaying, onPlayPauseClick, onStopClick}: ControlsProps) => 
     }, [isPlaying, repeat]);
 
     return(
-        <div className='row row-cols-2'>
-            <div className='col col-md-3 mt-2'>
+        <div className='row row-cols-2 w-70 ms-3'>
+            <div className='col col-4 d-flex justify-content-center '>
                 <ImageButton src={isPlaying ? pauseIcon : playIcon} onClick={() => onPlayPauseClick()}/>
                 <ImageButton src={stopIcon} onClick={() => onStopClick()}/>
             </div>
-            <div className='col'>
-                <p>Audioplayer</p>
+            <div className='col col-6'>
+                <p className='filename'>{fileName}</p>
                 <ProgressBar />
             </div>
         </div>
