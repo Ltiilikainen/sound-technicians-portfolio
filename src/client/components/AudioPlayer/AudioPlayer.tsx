@@ -12,6 +12,7 @@ type AudioPlayerProps = {
 };
 
 type ContextProps = {
+    fileName: string,
     trackState: TrackState,
     setTrackState: React.Dispatch<React.SetStateAction<TrackState>> | null,
     progress: number,
@@ -20,12 +21,15 @@ type ContextProps = {
     progressRef: React.RefObject<HTMLInputElement> | null
 }
 
-export const audioContext = createContext<ContextProps>({trackState: {trackDuration: null, playbackPosition: null}, setTrackState: null, progress: 0, setProgress: null, audioRef: null, progressRef: null});
+export const audioContext = createContext<ContextProps>({fileName: 'Audio', trackState: {trackDuration: null, playbackPosition: null}, setTrackState: null, progress: 0, setProgress: null, audioRef: null, progressRef: null});
 
 const AudioPlayer = ({audiopath}: AudioPlayerProps) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [trackState, setTrackState] = useState<TrackState>({trackDuration: null, playbackPosition: null});
     const [progress, setProgress] = useState(0);
+    //const pathArray = audiopath.split(['/ .']);
+
+    const fileName = 'audio';
 
     const audioRef = useRef<HTMLAudioElement>(null);
     const progressRef = useRef<HTMLInputElement>(null);
@@ -48,7 +52,7 @@ const AudioPlayer = ({audiopath}: AudioPlayerProps) => {
     }
     
     return (
-        <audioContext.Provider value={{trackState, setTrackState, progress, setProgress, audioRef, progressRef}}>
+        <audioContext.Provider value={{fileName, trackState, setTrackState, progress, setProgress, audioRef, progressRef}}>
             <div className='audio-player'>
                 <audio preload='metadata' src={audiopath} ref={audioRef} onLoadedMetadata={onLoadedMetadata} onTimeUpdate={(e) => {
                     setTrackState({...trackState, playbackPosition: e.currentTarget.currentTime});
