@@ -5,4 +5,4 @@ const equipmentBookingSchema = new mongoose.Schema({
     end_date: String, //ISO date string
 }, {timestamps:  true});
 
-module.exports = mongoose.model('equipment_only_bookings', equipmentBookingSchema);
+export default mongoose.model('equipment_only_bookings', equipmentBookingSchema);

@@ -1,20 +1,23 @@
-import mongoose from 'mongoose';
+import mongoose, {Schema} from 'mongoose';
+import equipment_types from './equipment_types';
+import uploads from './uploads';
+import equipment_children from './equipment_children';
 
 const equipmentParentSchema = new mongoose.Schema({
     equipment_name: String,
     equipment_type: {
-        type: String, //foreign key - equipment_types
-        ref: 'equipment_types'
+        type: Schema.Types.ObjectId, //foreign key - equipment_types
+        ref: equipment_types
     },
     image: {
-        type: String, //foreing key - uploads
-        ref: 'uploads',
+        type: Schema.Types.ObjectId, //foreing key - uploads
+        ref: uploads,
     },
     specs: String,
-    children: {
-        type: Array<string>, //foreign key - equipment_children
-        ref: 'equipment_children'
-    }
+    children: [{
+        type: Schema.Types.ObjectId, 
+        ref: equipment_children
+    }]
 });
 
-module.exports = mongoose.model('equipment_parents', equipmentParentSchema);
+export default mongoose.model('equipment_parents', equipmentParentSchema);

@@ -1,4 +1,6 @@
-import mongoose from 'mongoose';
+import mongoose, {Schema} from 'mongoose';
+import bookings_categories from './bookings_categories';
+import equipment_children from './equipment_children';
 
 const mainBookingSchema = new mongoose.Schema({
     start_date: String, //ISO Date string
@@ -6,12 +8,13 @@ const mainBookingSchema = new mongoose.Schema({
     description: String,
     display_description: Boolean,
     category_id: {
-        type:  String, //foreign key - bookings_categories
-        ref: 'bookings_categories',
+        type:  Schema.Types.ObjectId,
+        ref: bookings_categories,
     },
-    equipment: {
-        type: Array<string>, //foreign keys - equipment_children
-        ref: 'equipment_children',}
+    equipment: [{
+        type: Schema.Types.ObjectId, 
+        ref: equipment_children
+    }]
 }, {timestamps: true});
 
-module.exports = mongoose.model('main_bookings', mainBookingSchema);
+export default mongoose.model('main_bookings', mainBookingSchema);
