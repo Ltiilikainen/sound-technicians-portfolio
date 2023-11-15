@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './About.css';
 import AudioPlayer from './AudioPlayer/AudioPlayer';
-import dbServices from '../dbServices';
+import requestServices from '../requestServices';
 
 const About = () => {
     const [audioFiles, setAudioFiles] = useState(Array<IWorkExample>);
 
     useEffect(() => {
-        dbServices.getWorkAudio()
+        requestServices.getWorkAudio()
             .then(fileList => {
                 setAudioFiles(fileList);});
     }, []);
@@ -27,11 +27,10 @@ const About = () => {
             </div>
 
             <div className='rates'>
-                <h1>My rates</h1>
-                <p><span className='prices'>18€/h</span>Lorem ipsum</p>
-                <p><span className='prices'>18€/h</span>Lorem ipsum</p>
-                <p><span className='prices'>18€/h</span>Lorem ipsum</p>
-                <p><span className='prices'>18€/h</span>Lorem ipsum</p>
+                <h1>My estimated rates</h1>
+                <p>Hourly via billing service<span className='prices'> ~40€/h</span></p>
+                <p>Daily via billing service<span className='prices'> ~400€ + VAT/d</span></p>
+                <p>Daily by income-tax card<span className='prices'> ~250-350€/d</span></p>
             </div>
 
             <h1>Work examples</h1>
