@@ -3,6 +3,7 @@ import ViteExpress from 'vite-express';
 import emailService from './Middleware/emailService';
 import dbConnectors from './Middleware/dbConnectors';
 import work_examples from './Schemas/work_examples';
+import main_bookings from './Schemas/main_bookings';
 
 const app = express();
 app.use(express.json());
@@ -18,6 +19,28 @@ app.get('/api/work-audio', (_, res) => {
                 {
                     try{
                         res.send(workAudio);
+                        
+                    } catch (e: unknown) {
+                        console.log((e as Error).message);
+                    }
+                }
+                )
+                .finally(() => {
+                    dbConnectors.disconnect();
+                });
+        });
+});
+
+app.get('/api/bookings', (_, res) => {
+    dbConnectors.connectReader()
+        .catch(e => console.log(e))
+        .then(() => {
+            main_bookings.find()
+                .catch(e => console.log(e.message))
+                .then(bookings => 
+                {
+                    try{
+                        res.send(bookings);
                         
                     } catch (e: unknown) {
                         console.log((e as Error).message);

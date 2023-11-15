@@ -7,9 +7,14 @@ const getWorkAudio = () => {
     return request.then(response => response.data);
 };
 
+const getSchedule = () => {
+    const request = axios.get(`${baseURL}/bookings`);
+    return request.then(response => response.data);
+};
+
 const sendForm = (formData: IFormData) => {
     const request = axios.post(`${baseURL}/contact`, {formData});
     return request.then(response => response.data);
 };
 
-export default {getWorkAudio, sendForm};
+export default {getWorkAudio, getSchedule, sendForm};
