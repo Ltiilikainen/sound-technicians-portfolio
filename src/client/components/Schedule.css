@@ -17,6 +17,10 @@
     outline: solid 1px rgba(255, 255, 255, 0.228);
 }
 
+.fc .fc-daygrid-day-frame .fc-bg-event {
+    z-index: 0;
+}
+
 .fc a {
     text-decoration: none;
     color: var(--fc-neutral-text-color);
