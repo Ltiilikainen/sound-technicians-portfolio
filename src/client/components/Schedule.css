@@ -1,14 +1,30 @@
 :root {
     --fc-today-bg-color: rgba(79, 79, 211, 0.39);
+    --fc-page-bg-color: rgb(43, 43, 50);
+    --fc-bg-event-color: rgb(27, 27, 154);
     --fc-bg-event-opacity: 1;
 }
 
 .fc {
-    padding: 0.5em;
-    background-color: rgb(36, 36, 44);
+    padding: 1em 0.8em;
+    background-color: rgb(43, 43, 50);
+    border-radius: 30px;
+
+    max-width: 80em;
+}
+
+.fc-daygrid-day-frame {
+    outline: solid 1px rgba(255, 255, 255, 0.228);
 }
 
 .fc a {
     text-decoration: none;
     color: var(--fc-neutral-text-color);
+
+}
+
+.fc-event-title {
+    padding: 2em 0 0 0;
+    color: rgba(255, 255, 255);
+    text-shadow: 0em 0 0.2em rgb(0, 0, 0), 0em 0 0.4em rgb(0, 0, 0);
 }

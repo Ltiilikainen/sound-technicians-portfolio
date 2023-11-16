@@ -1,8 +1,9 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import './Schedule.css';
 import requestServices from '../requestServices';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
+import multiMonthPlugin from '@fullcalendar/multimonth';
 
 interface ICalendarEvents {
     title?: string,
@@ -12,20 +13,20 @@ interface ICalendarEvents {
 
 const Schedule = () => {
     const [events, setEvents] = useState<Array<ICalendarEvents>>([]);
+    const [scheduleRef, setScheduleRef] = useState(useRef<FullCalendar | null>(null));
 
     useEffect(() => {
         requestServices.getSchedule()
             .then(schedule => setEvents(schedule.map((item:IBooking) => parseEvent(item)))
             );
-        console.log(events);
     }, []);
 
     function parseEvent (event:IBooking) {
         if(event.display_description)
         {
-            return {title: event.description, start: Date.parse(event.start_date), end: Date.parse(event.end_date)};
+            return {title: event.description, start: event.start_date, end: Date.parse(event.end_date), allDay: true, display: 'background'};
         } else {
-            return {start: Date.parse(event.start_date), end: Date.parse(event.end_date)};
+            return {start: event.start_date, end: event.end_date, allDay: true, display: 'background'};
         }
     }
 
@@ -33,13 +34,33 @@ const Schedule = () => {
         <div className="container">
             <h1>Schedule</h1>
 
-            <FullCalendar
-                plugins={[dayGridPlugin]}
-                initialView='dayGridMonth'
-                weekends={true}
-                events={events}
-                displayEventTime={false}
-            />
+            <label htmlFor="datesearch" className="me-1">Search</label>
+            <input id="datesearch" type="date" onChange={e => {
+                scheduleRef.current?.getApi().gotoDate(Date.parse(e.target.value));
+            }}></input>
+
+            <div className='my-4'>
+                <FullCalendar
+                    ref={scheduleRef}
+                    viewDidMount={() => setScheduleRef(scheduleRef)}
+                    plugins={[dayGridPlugin]}
+                    initialView='dayGridMonth'
+                    weekends={true}
+                    events={events}
+                    displayEventTime={false}
+                    contentHeight={'auto'}
+                />
+            </div>
+
+            <div className='mb-4'>
+                <FullCalendar
+                    plugins={[multiMonthPlugin]}
+                    initialView='multiMonthSixMonth'
+                    views={{'multiMonthSixMonth': {type: 'multiMonth', duration: {months: 6}}}}
+                    events={events}
+                    displayEventTime={false}
+                />
+            </div>
         </div>
     );
 };
