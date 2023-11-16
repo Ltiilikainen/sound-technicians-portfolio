@@ -14,6 +14,7 @@ interface ICalendarEvents {
 const Schedule = () => {
     const [events, setEvents] = useState<Array<ICalendarEvents>>([]);
     const [scheduleRef, setScheduleRef] = useState(useRef<FullCalendar | null>(null));
+    const [searchDate, setSearchDate] = useState('');
 
     useEffect(() => {
         requestServices.getSchedule()
@@ -34,10 +35,10 @@ const Schedule = () => {
         <div className="container">
             <h1>Schedule</h1>
 
-            <label htmlFor="datesearch" className="me-1">Search</label>
+            
             <input id="datesearch" type="date" onChange={e => {
-                scheduleRef.current?.getApi().gotoDate(Date.parse(e.target.value));
-            }}></input>
+                setSearchDate(e.target.value);
+            }}></input> <button className="btn btn-light ms-1" onClick={() => scheduleRef.current?.getApi().gotoDate(Date.parse(searchDate))}>Search</button>
 
             <div className='my-4'>
                 <FullCalendar
