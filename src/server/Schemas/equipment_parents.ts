@@ -16,7 +16,7 @@ const equipmentParentSchema = new mongoose.Schema({
     specs: String,
     children: [{
         type: Schema.Types.ObjectId, 
-        ref: equipment_children
+        ref: equipment_children,
     }]
 });
 

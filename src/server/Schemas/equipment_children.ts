@@ -4,13 +4,14 @@ import main_bookings from './main_bookings';
 import equipment_only_bookings from './equipment_only_bookings';
 
 const equipmentChildSchema: Schema = new mongoose.Schema({
-    parent_id: {
+    parent: {
         type: Schema.Types.ObjectId,
         ref: equipment_parents,
+        required: true
     },
     bookings: [{
         type: Schema.Types.ObjectId,
-        ref: [main_bookings, equipment_only_bookings]
+        ref: [main_bookings, equipment_only_bookings],
     }],
 });
 

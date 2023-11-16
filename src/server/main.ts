@@ -4,6 +4,8 @@ import emailService from './Middleware/emailService';
 import dbConnectors from './Middleware/dbConnectors';
 import work_examples from './Schemas/work_examples';
 import main_bookings from './Schemas/main_bookings';
+import equipment_parents from './Schemas/equipment_parents';
+import equipment_children from './Schemas/equipment_children';
 
 const app = express();
 app.use(express.json());
@@ -36,6 +38,10 @@ app.get('/api/bookings', (_, res) => {
         .catch(e => console.log(e))
         .then(() => {
             main_bookings.find()
+                .populate({path: 'category_id',
+                    select: 'category_name -_id'})
+                .populate({path: 'equipment'})
+                .exec()
                 .catch(e => console.log(e.message))
                 .then(bookings => 
                 {
@@ -47,6 +53,53 @@ app.get('/api/bookings', (_, res) => {
                     }
                 }
                 )
+                .finally(() => {
+                    dbConnectors.disconnect();
+                });
+        });
+});
+
+app.get('/api/equipment', (_, res) => {
+    dbConnectors.connectReader()
+        .catch(e => console.log(e))
+        .then(() => {
+            equipment_children.find()
+                //.populate({path: 'equipment_type'})
+                .exec()
+                .catch(e => console.log(e.message))
+                .then(equipmentList => 
+                {
+                    try{
+                        res.send(equipmentList);
+                        
+                    } catch (e: unknown) {
+                        console.log((e as Error).message);
+                    }
+                }
+                )
+                .finally(() => {
+                    dbConnectors.disconnect();
+                });
+        });
+});
+
+app.get('/api/equipment/:id', (req, res) => {
+    const id = req.params.id;
+    dbConnectors.connectReader()
+        .catch(e => console.log(e))
+        .then(() => {
+            equipment_children.find().where('parent_id').equals(id)
+                .populate('parent_id')
+                .populate('bookings')
+                .catch(e => console.log(e.message))
+                .then(items => 
+                {
+                    try {
+                        res.send(items);
+                    } catch (e: unknown) {
+                        console.log((e as Error).message);
+                    }
+                })
                 .finally(() => {
                     dbConnectors.disconnect();
                 });
