@@ -5,7 +5,8 @@ import dbConnectors from './Middleware/dbConnectors';
 import work_examples from './Schemas/work_examples';
 import main_bookings from './Schemas/main_bookings';
 import equipment_parents from './Schemas/equipment_parents';
-import equipment_children from './Schemas/equipment_children';
+import equipment_individuals from './Schemas/equipment_individuals';
+import bookings from './Schemas/bookings';
 
 const app = express();
 app.use(express.json());
@@ -40,7 +41,9 @@ app.get('/api/bookings', (_, res) => {
             main_bookings.find()
                 .populate({path: 'category_id',
                     select: 'category_name -_id'})
-                .populate({path: 'equipment'})
+                .populate('time_id')
+                .populate({path: 'equipment', model: equipment_individuals,
+                    populate: {path: 'description', model: equipment_parents}})
                 .exec()
                 .catch(e => console.log(e.message))
                 .then(bookings => 
@@ -63,8 +66,8 @@ app.get('/api/equipment', (_, res) => {
     dbConnectors.connectReader()
         .catch(e => console.log(e))
         .then(() => {
-            equipment_children.find()
-                //.populate({path: 'equipment_type'})
+            equipment_parents.find()
+                .populate('type')
                 .exec()
                 .catch(e => console.log(e.message))
                 .then(equipmentList => 
@@ -88,9 +91,11 @@ app.get('/api/equipment/:id', (req, res) => {
     dbConnectors.connectReader()
         .catch(e => console.log(e))
         .then(() => {
-            equipment_children.find().where('parent_id').equals(id)
-                .populate('parent_id')
-                .populate('bookings')
+            equipment_parents.find().where('_id').equals(id)
+                .populate('type')
+                .populate({path: 'individuals', model: equipment_individuals,
+                    select: 'bookings', populate: {path: 'bookings', model: bookings}})
+                .exec()
                 .catch(e => console.log(e.message))
                 .then(items => 
                 {

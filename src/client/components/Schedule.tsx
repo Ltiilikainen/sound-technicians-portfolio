@@ -18,16 +18,16 @@ const Schedule = () => {
 
     useEffect(() => {
         requestServices.getSchedule()
-            .then(schedule => setEvents(schedule.map((item:IBooking) => parseEvent(item)))
+            .then(schedule => setEvents(schedule.map((item:IEvent) => parseEvent(item)))
             );
     }, []);
 
-    function parseEvent (event:IBooking) {
+    function parseEvent (event:IEvent) {
         if(event.display_description)
         {
-            return {title: event.description, start: event.start_date, end: Date.parse(event.end_date), allDay: true, display: 'background'};
+            return {title: event.description, start: event.time_id.start_date, end: Date.parse(event.time_id.end_date), allDay: true, display: 'background'};
         } else {
-            return {start: event.start_date, end: event.end_date, allDay: true, display: 'background'};
+            return {start: event.time_id.start_date, end: event.time_id.end_date, allDay: true, display: 'background'};
         }
     }
 

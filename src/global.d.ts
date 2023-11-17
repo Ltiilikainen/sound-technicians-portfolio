@@ -26,17 +26,15 @@ interface IBooking {
     _id: string,
     start_date: string,
     end_date: string,
+}
+
+interface IEvent {
+    _id: string,
+    time_id: IBooking,
     description: string,
     display_description: boolean,
     category_id: string,
     equipment: Array<string>,
-    created_at?: unknown,
-    updated_at?: unknown
-}
-
-interface IEquipmentBooking {
-    start_date: string,
-    end_date: string,
     created_at?: unknown,
     updated_at?: unknown
 }
@@ -48,13 +46,15 @@ interface IEquipmentType {
 
 interface IEquipmentChild {
     _id: string,
-    parent_id: string,
-    bookings: Array<IBooking | IEquipmentBooking>
+    description: string | IEquipment,
+    bookings: Array<IBooking>
 }
 
 interface IEquipment {
+    _id: string,
     name: string, 
-    type: ObjectId | IEquipmentType, 
-    image: ObjectId | IFile,
-    children: Array<string | IEquipmentChild>
+    type: string | IEquipmentType, 
+    image: string | IFile,
+    specs: string,
+    individuals: Array<string | IEquipmentChild>
 }
