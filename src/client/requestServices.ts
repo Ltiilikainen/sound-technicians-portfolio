@@ -17,9 +17,14 @@ const getAllEquipment = () => {
     return request.then(response => response.data);
 };
 
+const getOneEquipment = (id: string) => {
+    const request = axios.get(`${baseURL}/equipment/${id}`);
+    return request.then(response => response.data);
+};
+
 const sendForm = (formData: IFormData) => {
     const request = axios.post(`${baseURL}/contact`, {formData});
     return request.then(response => response.data);
 };
 
-export default {getWorkAudio, getSchedule, getAllEquipment, sendForm};
+export default {getWorkAudio, getSchedule, getAllEquipment, getOneEquipment, sendForm};

@@ -1,5 +1,4 @@
 import React, {useEffect, useState, useRef} from 'react';
-import './Schedule.css';
 import requestServices from '../requestServices';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';

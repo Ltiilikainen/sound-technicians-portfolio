@@ -91,7 +91,7 @@ app.get('/api/equipment/:id', (req, res) => {
     dbConnectors.connectReader()
         .catch(e => console.log(e))
         .then(() => {
-            equipment_parents.find().where('_id').equals(id)
+            equipment_parents.findOne().where('_id').equals(id)
                 .populate('type')
                 .populate({path: 'individuals', model: equipment_individuals,
                     select: 'bookings', populate: {path: 'bookings', model: bookings}})

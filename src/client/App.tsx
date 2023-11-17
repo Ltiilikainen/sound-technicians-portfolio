@@ -10,6 +10,7 @@ import About from './components/About';
 import Schedule from './components/Schedule';
 import EquipmentList from './components/EquipmentList';
 import ContactForm from './components/ContactForm';
+import EquipmentPage from './components/EquipmentPage';
 
 function App() {
     return (
@@ -22,6 +23,7 @@ function App() {
                     <Route path='/about' element={<About />} />
                     <Route path='/calendar' element={<Schedule />} />
                     <Route path='/equipment' element={<EquipmentList />} />
+                    <Route path='/equipment/:id' element={<EquipmentPage />} />
                     <Route path='/contact-me' element={<ContactForm />} />
                 </Routes>
             </Router>
