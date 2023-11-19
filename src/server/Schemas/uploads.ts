@@ -1,8 +1,10 @@
 import mongoose from 'mongoose';
 
 const uploadSchema = new mongoose.Schema({
-    type: String,
-    path: String,
+    type: {type: String,
+        required: true},
+    path: {type: String,
+        required: true},
     tag: String
 }, {query:
 {

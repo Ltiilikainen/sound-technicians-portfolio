@@ -4,7 +4,8 @@ import uploads from './uploads';
 import equipment_children from './equipment_individuals';
 
 const equipmentParentSchema = new mongoose.Schema({
-    name: String,
+    name: {type: String,
+        required:  [true, 'Equipment must have a name']},
     type: {
         type: Schema.Types.ObjectId, //foreign key - equipment_types
         ref: equipment_types
