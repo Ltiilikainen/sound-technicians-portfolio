@@ -93,6 +93,7 @@ app.get('/api/equipment/:id', (req, res) => {
         .then(() => {
             equipment_parents.findOne().where('_id').equals(id)
                 .populate('type')
+                .populate('image')
                 .populate({path: 'individuals', model: equipment_individuals,
                     select: 'bookings', populate: {path: 'bookings', model: bookings}})
                 .exec()

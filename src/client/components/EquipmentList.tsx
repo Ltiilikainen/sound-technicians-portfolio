@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import requestServices from '../requestServices';
 import EquipmentTumb from './EquipmentThumb';
+import './EquipmentList.css';
 
 const EquipmentList = () => {
     const [equipment, setEquipment] = useState(Array<IEquipment>);
     const [filteredEquipment, setFilteredEquipment] = useState(Array<IEquipment>);
     const searchBarRef = useRef<HTMLInputElement>(null);
-    const typeArray = ['microphone', 'PA'];
+    let typeArray = ['microphone', 'PA'];
 
     useEffect(() => {
         requestServices.getAllEquipment()
@@ -46,20 +47,32 @@ const EquipmentList = () => {
                         filterEquipment());}}>Reset</button>
             </div>
             <div className='row'>
-                <div className='col col-12 col-md-4'>
-                    <div className='d-flex flex-sm-row flex-md-column text-start'>
+                <div className='col col-12 col-md-3'>
+                    <div className='d-flex flex-sm-row flex-md-column text-start type-toggle mb-2'>
                         <div className='form-check form-check-inline'>
-                            <input className='form-check-inline' type='checkbox' defaultChecked={true} id='microphone' onChange={e => handleChange(e.target.checked, 'microphone')}></input><label htmlFor='microphone'>Microphone</label>
+                            <input className='form-check-inline' type='checkbox' defaultChecked={true} id='selectAll' onChange={e => {
+                                const checks = document.getElementsByName('type');
+                                checks.forEach(check => (check as HTMLInputElement).checked = e.target.checked);
+                                if (e.target.checked) {
+                                    typeArray = ['microphone', 'PA'];
+                                } else {
+                                    typeArray = [];
+                                }
+                                setFilteredEquipment(filterEquipment());
+                            }}></input><label htmlFor='microphone'>Select all</label>
                         </div>
                         <div className='form-check form-check-inline'>
-                            <input className='form-check-inline' defaultChecked={true} type='checkbox' id='PA' onChange={e => handleChange(e.target.checked, 'PA')}></input><label htmlFor='PA'>PA</label>
+                            <input className='form-check-inline' type='checkbox' name='type' defaultChecked={true} id='microphone' onChange={e => handleChange(e.target.checked, 'microphone')}></input><label htmlFor='microphone'>Microphone</label>
+                        </div>
+                        <div className='form-check form-check-inline'>
+                            <input className='form-check-inline' type='checkbox' name='type' defaultChecked={true}  id='PA' onChange={e => handleChange(e.target.checked, 'PA')}></input><label htmlFor='PA'>PA</label>
                         </div>
                     </div>
                 </div>
                 <div className='col col-12 col-md-8'>
 
                     {
-                        filteredEquipment.map(item => <EquipmentTumb key={item._id} id={item._id} name={item.name} specs={item.specs} individuals={item.individuals} />)
+                        filteredEquipment.map(item => <EquipmentTumb key={item._id} id={item._id} name={item.name} img={item.image} specs={item.specs} individuals={item.individuals} />)
                     }
                 </div>
             </div>

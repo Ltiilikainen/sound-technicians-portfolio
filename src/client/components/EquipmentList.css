@@ -1,0 +1,26 @@
+.type-toggle {
+    padding: 1em 0;
+    color: black;
+    background-color: rgb(231, 227, 227);
+    border: solid grey 0.5px;
+}
+
+.equipment-card {
+    border-radius: 0;
+    background-color: rgb(231, 227, 227);
+    padding: 0.5em 1em;
+}
+
+.equipment-card a {
+    color: black;
+}
+
+.equipment-img {
+    display: block;
+    width: 100px;
+    height: 130px;
+    background: grey;
+    background: linear-gradient(180deg, rgb(207, 206, 206) 0%, rgb(128, 126, 126) 100%);
+
+    overflow: hidden;
+}
