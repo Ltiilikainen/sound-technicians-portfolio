@@ -18,6 +18,14 @@ const mainBookingSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId, 
         ref: equipment_individuals
     }]
-}, {timestamps: true});
+}, {query: 
+{populatePaths() {
+    return this.populate({path: 'category_id',
+        select: 'category_name -_id'})
+        .populate('time_id')
+        .populate({path: 'equipment'})
+        .exec();
+}}
+});
 
 export default mongoose.model('main_bookings', mainBookingSchema);

@@ -1,0 +1,43 @@
+.ref-thumb {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    margin: 2em auto;
+}
+
+.ref-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 100%;
+
+    margin-bottom: 2em;
+
+    background: grey;
+    background: linear-gradient(180deg, rgb(207, 206, 206) 0%, rgb(128, 126, 126) 100%);
+    overflow: hidden;
+}
+
+.ref-img img {
+    max-width: 80px;
+    max-height: 80px;
+}
+
+.ref-person {
+    position: absolute;
+    transform: translateY(3.8em);
+}
+
+.ref-name {
+    font-size: 1.3em;
+    margin-bottom: 0;
+
+    text-shadow: 0 -0.1em 0em rgb(66, 66, 66), 0 -0.1em 0.2em rgba(99, 99, 99, 0.521);
+}
+
+.ref-card {
+    padding: 1em 0.5em;
+    color: black;
+    background-color: rgba(231, 227, 227, 0.486);
+    border: solid grey 0.5px;
+}

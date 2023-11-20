@@ -5,6 +5,14 @@ interface IFile {
     tag: string
 }
 
+interface IReference {
+    _id: string,
+    name: string,
+    affiliation: string,
+    image: string | IFile,
+    content: string
+}
+
 interface IWorkExample {
     _id: string,
     file: IFile,
@@ -37,6 +45,14 @@ interface IEvent {
     equipment: Array<string>,
     created_at?: unknown,
     updated_at?: unknown
+}
+
+interface ICalendarEvents {
+    title?: string,
+    start: string,
+    end: string,
+    allDay?: boolean,
+    display?: string
 }
 
 interface IEquipmentType {

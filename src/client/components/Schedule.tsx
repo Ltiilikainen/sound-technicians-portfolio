@@ -4,12 +4,6 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import multiMonthPlugin from '@fullcalendar/multimonth';
 
-interface ICalendarEvents {
-    title?: string,
-    start: string,
-    end: string
-}
-
 const Schedule = () => {
     const [events, setEvents] = useState<Array<ICalendarEvents>>([]);
     const [scheduleRef, setScheduleRef] = useState(useRef<FullCalendar | null>(null));
@@ -59,6 +53,7 @@ const Schedule = () => {
                     views={{'multiMonthSixMonth': {type: 'multiMonth', duration: {months: 6}}}}
                     events={events}
                     displayEventTime={false}
+                    contentHeight={'auto'}
                 />
             </div>
         </div>

@@ -1,7 +1,8 @@
 import mongoose, {Schema} from 'mongoose';
 import equipment_types from './equipment_types';
 import uploads from './uploads';
-import equipment_children from './equipment_individuals';
+import equipment_individuals from '../Schemas/equipment_individuals';
+import bookings from '../Schemas/bookings';
 
 const equipmentParentSchema = new mongoose.Schema({
     name: {type: String,
@@ -17,8 +18,15 @@ const equipmentParentSchema = new mongoose.Schema({
     specs: String,
     individuals: [{
         type: Schema.Types.ObjectId, 
-        ref: equipment_children,
+        ref: equipment_individuals,
     }]
-});
+}, {query: {
+    populatePaths() {
+        return this.populate('type')
+            .populate('image')
+            .populate({path: 'individuals', model: equipment_individuals, select: 'bookings', populate:{path: 'bookings', model: bookings}})
+            .exec();
+    }
+}});
 
 export default mongoose.model('equipment_parents', equipmentParentSchema);

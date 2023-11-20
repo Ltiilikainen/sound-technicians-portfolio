@@ -8,6 +8,10 @@ const workExampleSchema = new mongoose.Schema({
         required: true
     },
     occasion: String
-});
+}, {query: {
+    populatePaths() {
+        return this.populate('file').exec();
+    }
+}});
 
 export default mongoose.model('work_examples', workExampleSchema);

@@ -12,6 +12,12 @@ const equipmentChildSchema: Schema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: bookings,
     }],
-});
+}, {query: {
+    populatePaths() {
+        return this.populate({path: 'description', populate: [{path: 'type'}, {path: 'image'}]})
+            .populate('bookings')
+            .exec();
+    }
+}});
 
 export default mongoose.model('equipment_individuals', equipmentChildSchema);

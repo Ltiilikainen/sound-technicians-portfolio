@@ -17,7 +17,8 @@ const EquipmentPage = () => {
             requestServices.getOneEquipment(id)
                 .then(result => {
                     if(result === '') setError('Equipment not found');
-                    else setEquipmentInfo(result);
+                    else setEquipmentInfo(result[0]);
+                    console.log(result);
                 }
                 );
         } else {

@@ -16,6 +16,9 @@ const uploadSchema = new mongoose.Schema({
     },
     selectVideo() {
         return this.where({$or: [{type: 'mp4'}, {type: 'avi'}, {type: 'wmv'}, {type: 'mpg'}, {type: 'mpeg'}]});
+    },
+    populatePaths() {
+        return this.populate('type').exec();
     }
 }});
 

@@ -2,6 +2,16 @@ import axios from 'axios';
 
 const baseURL = '/api';
 
+const getHomePage = () => {
+    const request = axios.get(`${baseURL}/home`);
+    return request.then(response => response.data);
+};
+
+const getReferences = () => {
+    const request = axios.get(`${baseURL}/references`);
+    return request.then(response => response.data);
+};
+
 const getWorkAudio = () => {
     const request = axios.get(`${baseURL}/work-audio`);
     return request.then(response => response.data);
@@ -27,4 +37,4 @@ const sendForm = (formData: IFormData) => {
     return request.then(response => response.data);
 };
 
-export default {getWorkAudio, getSchedule, getAllEquipment, getOneEquipment, sendForm};
+export default {getHomePage, getReferences, getWorkAudio, getSchedule, getAllEquipment, getOneEquipment, sendForm};
