@@ -1,8 +1,8 @@
 import mongoose, {Schema} from 'mongoose';
 import equipment_types from './equipment_types';
 import uploads from './uploads';
-import equipment_individuals from '../Schemas/equipment_individuals';
-import bookings from '../Schemas/bookings';
+import equipment_individuals from './equipment_individuals';
+import bookings from './bookings';
 
 const equipmentParentSchema = new mongoose.Schema({
     name: {type: String,

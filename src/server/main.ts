@@ -1,11 +1,23 @@
 import express from 'express';
 import ViteExpress from 'vite-express';
+
+import referencesRouter from './Routes/referencesRouter';
+import workExamplesRouter from './Routes/workExamplesRouter';
+import bookingsRouter from './Routes/bookingsRouter';
+import equipmentRouter from './Routes/equipmentRouter';
+
 import emailService from './Middleware/emailService';
 import dbConnectors from './Middleware/dbConnectors';
 import dbServices from './Middleware/dbServices';
+import { genToken, verifyPass } from './Middleware/authorization';
 
 const app = express();
 app.use(express.json());
+
+app.use('/api/references', referencesRouter);
+app.use('/api/work-examples', workExamplesRouter);
+app.use('/api/bookings', bookingsRouter);
+app.use('/api/equipment', equipmentRouter);
 
 type responseData = {
 refs: IReference[],
@@ -21,6 +33,7 @@ app.get('/api/home', (_, res) => {
         .catch(e => {
             console.log(e.message);
             res.status(500).send('Internal server error');
+            return;
         })
         .then(() => {
             dbServices.readRefs({sample: true})
@@ -30,36 +43,40 @@ app.get('/api/home', (_, res) => {
                     } catch (e: unknown) {
                         console.log((e as Error).message);
                         res.status(500).send('Internal server error');
+                        return;
                     }
                 })
                 .then(() => {
                     dbServices.readUploads({tag: 'worked-with'})
-                        .then(data => {
+                        .then((data: unknown) => {
                             try {
                                 dataArray.workedWith = (data as IFile[])[0].path;
                             } catch (e: unknown) {
                                 console.log((e as Error).message);
                                 res.status(500).send('Internal server error');
+                                return;
                             }
                         })
                         .then(() => {
                             dbServices.readWorkExamples({sample: true})
-                                .then(data => {
+                                .then((data: unknown) => {
                                     try {
                                         dataArray.workExamples = (data as IWorkExample[]);
                                     } catch (e: unknown) {
                                         console.log((e as Error).message);
                                         res.status(500).send('Internal server error');
+                                        return;
                                     }
                                 })
                                 .then(() => {
                                     dbServices.readBookings()
-                                        .then(data => {
+                                        .then((data: unknown) => {
                                             try {
                                                 dataArray.bookings = (data as IEvent[]);
                                             } catch (e: unknown) {
                                                 console.log((e as Error).message);
                                                 res.status(500).send('Internal server error');
+                                                return;
                                             }
                                         })
                                         .finally(() => {
@@ -69,118 +86,6 @@ app.get('/api/home', (_, res) => {
                                 });
                         });
                 });     
-        });
-});
-
-app.get('/api/references', (_, res) => {
-    const queryData: Array<IReference[] | IFile>= [];
-    dbConnectors.connectReader()
-        .catch(e => {
-            console.log(e.message);
-            res.status(500).send('Internal server error');
-        })
-        .then(() => {
-            dbServices.readRefs()
-                .then(data => {
-                    try {
-                        queryData.push((data as IReference[]));
-                    } catch (e: unknown) {
-                        console.log((e as Error).message);
-                        res.status(500).send('Internal server error');
-                    }
-                });
-            dbServices.readUploads({tag: 'worked-with'})
-                .then(data => {
-                    try {
-                        queryData.push((data as IFile[])[0]);
-                        res.send(queryData);
-                    } catch (e: unknown) {
-                        console.log((e as Error).message);
-                        res.status(500).send('Internal server error');
-                    }
-                })
-                .finally(() => dbConnectors.disconnect());
-        });
-});
-
-app.get('/api/work-audio', (_, res) => {
-    dbConnectors.connectReader()
-        .catch(e => {
-            console.log(e.message);
-            res.status(500).send('Internal server error');
-        })
-        .then(() => {
-            dbServices.readWorkExamples()
-                .then(data => {
-                    try {
-                        res.send(data);
-                    } catch (e: unknown) {
-                        console.log((e as Error).message);
-                        res.status(500).send('Internal server error');
-                    }
-                })
-                .finally(() => dbConnectors.disconnect());
-        });
-});
-
-app.get('/api/bookings', (_, res) => {
-    dbConnectors.connectReader()
-        .catch(e => {
-            console.log(e.message);
-            res.status(500).send('Internal server error');
-        })
-        .then(() => {
-            dbServices.readBookings()
-                .then(data => {
-                    try {
-                        res.send(data);
-                    } catch (e: unknown) {
-                        console.log((e as Error).message);
-                        res.status(500).send('Internal server error');
-                    }
-                })
-                .finally(() => dbConnectors.disconnect());
-        });
-});
-
-app.get('/api/equipment', (_, res) => {
-    dbConnectors.connectReader()
-        .catch(e => {
-            console.log(e.message);
-            res.status(500).send('Internal server error');
-        })
-        .then(() => {
-            dbServices.readEquipment()
-                .then(data => {
-                    try {
-                        res.send(data);
-                    } catch (e: unknown) {
-                        console.log((e as Error).message);
-                        res.status(500).send('Internal server error');
-                    }
-                })
-                .finally(() => dbConnectors.disconnect());
-        });
-});
-
-app.get('/api/equipment/:id', (req, res) => {
-    const id = req.params.id;
-    dbConnectors.connectReader()
-        .catch(e => {
-            console.log(e.message);
-            res.status(500).send('Internal server error');
-        })
-        .then(() => {
-            dbServices.readEquipment({_id: id})
-                .then(data => {
-                    try {
-                        res.send(data);
-                    } catch (e: unknown) {
-                        console.log((e as Error).message);
-                        res.status(500).send('Internal server error');
-                    }
-                })
-                .finally(() => dbConnectors.disconnect());
         });
 });
 
@@ -194,6 +99,44 @@ app.post('/api/contact', async (req, res) => {
         res.send('Something went wrong');
     }
     
+});
+
+type UserData = {
+    username: string,
+    email:  string,
+    password: string
+};
+
+app.post('/api/login', (req, res) => {
+    const loginInfo = {username: req.body.username, password: req.body.password};
+
+    dbConnectors.connectWriter('user')
+        .catch(e => {
+            console.log(e.message);
+            return;
+        })
+        .then(() => {
+            dbServices.readUser({username: loginInfo.username})
+                .then(data => {
+                    if(!data[0] || !data[0].username || !data[0].password) res.send({verification: false});
+                    else {
+                        verifyPass(loginInfo.password, (data as UserData[])[0].password)
+                            .then(verification => {
+                                if(!verification) res.send({verification: verification});
+                                else{ 
+                                    const token = genToken(loginInfo.username);
+                                    res.send({verification: verification, token: token});
+                                }
+                            });
+                    }
+                })
+                .catch(e => {
+                    console.log(e.message);
+                    return;})
+                .finally(() => {
+                    dbConnectors.disconnect();
+                });
+        });
 });
 
 ViteExpress.listen(app, 3000, () =>

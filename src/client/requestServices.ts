@@ -1,4 +1,5 @@
 import axios from 'axios';
+import * as jose from 'jose';
 
 const baseURL = '/api';
 
@@ -13,7 +14,7 @@ const getReferences = () => {
 };
 
 const getWorkAudio = () => {
-    const request = axios.get(`${baseURL}/work-audio`);
+    const request = axios.get(`${baseURL}/work-examples`);
     return request.then(response => response.data);
 };
 
@@ -37,4 +38,31 @@ const sendForm = (formData: IFormData) => {
     return request.then(response => response.data);
 };
 
-export default {getHomePage, getReferences, getWorkAudio, getSchedule, getAllEquipment, getOneEquipment, sendForm};
+const loginAdmin = (username:  string, password: string) => {
+    const request = axios.post(`${baseURL}/login`, {username, password});
+    return request.then(response => response.data);
+};
+
+const verifyAdmin = (token: string, rsaPub: string) => {
+    if(rsaPub !== '') {
+        jose.importPKCS8(rsaPub, 'RS256')
+            .then(public_key => {
+                try {
+                    jose.jwtVerify(token, public_key)
+                        .then(result => {
+                            return result;
+                        })
+                        .catch((e) => {
+                            console.log(e);
+                            return false;
+                        }
+                        );
+                } catch (err) {
+                    return false;
+                }
+            });
+    }
+    return false;
+};
+
+export default {getHomePage, getReferences, getWorkAudio, getSchedule, getAllEquipment, getOneEquipment, sendForm, loginAdmin, verifyAdmin};
