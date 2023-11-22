@@ -5,7 +5,7 @@ import { Navigate } from 'react-router-dom';
 
 const AdminLogin = () => {
     const [success, setSuccess] = useState(false);
-    const [username, setUsername] = useState('');
+    const [loginusername, setLoginUsername] = useState('');
     const [password, setPassword] = useState('');
     const setJwT = useContext(authContext).setJwt;
     const setRsaPub = useContext(authContext).setRsaPub;
@@ -16,13 +16,13 @@ const AdminLogin = () => {
         if(!isFormValid) (form as HTMLFormElement).reportValidity();
         else {
             e.preventDefault();
-            requestServices.loginAdmin(username, password)
+            requestServices.loginAdmin(loginusername, password)
                 .then(data => {
                     if (!data.verification) {
                         (document.getElementById('invalid-alert') as HTMLElement).style.visibility = 'visible';
                     } else {
-                        setJwT && setJwT(data.token);
-                        setRsaPub && setRsaPub(data.pub_key);
+                        setJwT && setJwT(data.info.token);
+                        setRsaPub && setRsaPub(data.info.pub_key);
                         setSuccess(true);
                     }
                 });
@@ -38,7 +38,7 @@ const AdminLogin = () => {
                         <label htmlFor="username">Username</label>
                     </div>
                     <div className='col col-sm-4'>
-                        <input id="username" className="form-control" onChange={e => setUsername(e.target.value)} required></input>
+                        <input id="username" className="form-control" onChange={e => setLoginUsername(e.target.value)} required></input>
                     </div>
                 </div>
                 <div className="row justify-content-center mb-2">

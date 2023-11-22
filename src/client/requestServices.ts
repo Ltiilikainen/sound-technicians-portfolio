@@ -44,25 +44,25 @@ const loginAdmin = (username:  string, password: string) => {
 };
 
 const verifyAdmin = (token: string, rsaPub: string) => {
-    if(rsaPub !== '') {
-        jose.importPKCS8(rsaPub, 'RS256')
-            .then(public_key => {
-                try {
-                    jose.jwtVerify(token, public_key)
-                        .then(result => {
-                            return result;
-                        })
-                        .catch((e) => {
-                            console.log(e);
-                            return false;
-                        }
-                        );
-                } catch (err) {
-                    return false;
-                }
-            });
+    return verify(token, rsaPub);
+    
+    async function verify (token: string, rsaPub: string) 
+    {const data = {auth: false, username: ''};
+        if(token !== '' && rsaPub && rsaPub !== '') {
+            jose.importSPKI(rsaPub, 'RS256')
+                .then(public_key => {
+                    try {
+                        data.auth = true;
+                        jose.jwtVerify(token, public_key)
+                            .then(result => data.username = String(result.payload.username));
+                    } catch (err) {
+                        console.log(err);
+                    }
+                });
+        
+        }
+        return data;
     }
-    return false;
 };
 
 export default {getHomePage, getReferences, getWorkAudio, getSchedule, getAllEquipment, getOneEquipment, sendForm, loginAdmin, verifyAdmin};

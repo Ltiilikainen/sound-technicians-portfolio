@@ -23,7 +23,6 @@ const HomePage = () => {
     useEffect(() => {
         requestServices.getHomePage()
             .then((data: HomeRequest) => {
-                console.log(data);
                 setWorkedWithImg(data.workedWith);
                 setRefArray(data.refs.map(ref => ref = {_id: ref._id, name: ref.name, image: ((ref.image as unknown) as IFile[])[0], affiliation: ref.affiliation, content: ref.content}));
                 setWorkeExamples(data.workExamples.map(example => example = {_id: example._id, file: ((example.file as unknown) as IFile[])[0], occasions: example.occasions}));

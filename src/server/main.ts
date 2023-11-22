@@ -124,8 +124,8 @@ app.post('/api/login', (req, res) => {
                             .then(verification => {
                                 if(!verification) res.send({verification: verification});
                                 else{ 
-                                    const token = genToken(loginInfo.username);
-                                    res.send({verification: verification, token: token});
+                                    genToken(loginInfo.username)
+                                        .then(tokenRes => res.send({verification: verification, info: tokenRes}));
                                 }
                             });
                     }

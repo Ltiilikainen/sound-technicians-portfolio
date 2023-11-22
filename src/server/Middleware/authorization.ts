@@ -15,9 +15,9 @@ const genToken = async (username: string) => {
     const alg = 'RS256';
 
     const pkcs8 = fs.readFileSync('./src/server/private.key', 'utf-8');
-    const pub_key = fs.readFileSync('./src/server/private.key', 'utf-8');
+    const pub_key = fs.readFileSync('./src/server/public.key', 'utf-8');
 
-    const priv_key = await jose.importPKCS8(pkcs8, alg) ;
+    const priv_key = await jose.importPKCS8(pkcs8, alg);
 
     try {
         const token = await new jose.SignJWT(payload)
