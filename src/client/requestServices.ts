@@ -43,6 +43,11 @@ const loginAdmin = (username:  string, password: string) => {
     return request.then(response => response.data);
 };
 
+const testAuth = (token: string) => {
+    const request = axios.get(`${baseURL}/bookings/test`, {headers: {'Authorization': `Bearer ${token}`}});
+    return request.then(response => response.data);
+};
+
 const verifyAdmin = (token: string, rsaPub: string) => {
     return verify(token, rsaPub);
     
@@ -65,4 +70,4 @@ const verifyAdmin = (token: string, rsaPub: string) => {
     }
 };
 
-export default {getHomePage, getReferences, getWorkAudio, getSchedule, getAllEquipment, getOneEquipment, sendForm, loginAdmin, verifyAdmin};
+export default {getHomePage, getReferences, getWorkAudio, getSchedule, getAllEquipment, getOneEquipment, sendForm, loginAdmin, verifyAdmin, testAuth};
