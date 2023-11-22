@@ -42,8 +42,10 @@ function App() {
         <div className="App">
             <authContext.Provider value={{jwt: jwt, setJwt: setJwt, rsaPub: rsaPub, setRsaPub: setRsaPub}}>
                 <Router>
-                    <AdminNav username={auth.username}/>
-                    <NavBar />
+                    <div className='sticky-top'>
+                        <AdminNav username={auth.username}/>
+                        <NavBar/>
+                    </div>
                     <Routes> 
                         {/*Visitor routes*/}
                         <Route path='/' element={<HomePage />} />
