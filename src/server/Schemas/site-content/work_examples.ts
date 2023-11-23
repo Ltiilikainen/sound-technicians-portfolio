@@ -7,7 +7,7 @@ const workExampleSchema = new mongoose.Schema({
         ref: uploads,
         required: true
     },
-    occasion: String
+    occasions: String
 }, {query: {
     populatePaths() {
         return this.populate('file').exec();

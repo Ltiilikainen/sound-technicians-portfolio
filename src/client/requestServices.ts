@@ -25,6 +25,11 @@ const uploadWorkAudio = (formData: FormData, token: string) => {
     return request.then(response => response);
 };
 
+const writeNewWorkAudio = (data: {fileType: string, folder: string, file: string, tag: string, occasions: string}, token: string) => {
+    const request = axios.post(`${baseURL}/work-examples`, data, {'headers':{Authorization: `Bearer ${token}`}});
+    return request.then(response => response);
+};
+
 /*Schedule ports*/
 const getSchedule = (id?: string) => {
     const request = id ? axios.get(`${baseURL}/bookings/${id}`) : axios.get(`${baseURL}/bookings`);
@@ -79,6 +84,7 @@ export default {
     getReferences, 
     getWorkAudio,
     uploadWorkAudio, 
+    writeNewWorkAudio,
     getSchedule, 
     getEquipment, 
     sendForm, 

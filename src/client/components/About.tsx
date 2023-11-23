@@ -2,15 +2,22 @@ import React, { useState, useEffect } from 'react';
 import './About.css';
 import AudioPlayer from './AudioPlayer/AudioPlayer';
 import requestServices from '../requestServices';
+import WorkExampleForm from './Admin/WorkExampleForm';
 
 const About = () => {
     const [audioFiles, setAudioFiles] = useState(Array<IWorkExample>);
+    const [updated, setUpdated] = useState(true);
 
     useEffect(() => {
-        requestServices.getWorkAudio()
-            .then(fileList => {
-                setAudioFiles(fileList);});
-    }, []);
+        if(updated) {
+            requestServices.getWorkAudio()
+                .then(fileList => {
+                    console.log(fileList);
+                    setAudioFiles(fileList);
+                    setUpdated(false);
+                });
+        }
+    }, [updated]);
     
     return(
         <div className="container">
@@ -42,12 +49,13 @@ const About = () => {
                             <AudioPlayer audiopath={`../../${file.file.path}`}/>
                         </div>
                         <div className='col col-md-5 text-start pt-3'>
-                            <h3>Occasion</h3>
+                            <h3>Occasions</h3>
                             <p>{file.occasions}</p>
                         </div>
                     </div>
                 );}
             )}
+            <WorkExampleForm id={undefined} setUpdated={setUpdated} />
         </div>
     );
 };

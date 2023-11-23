@@ -9,7 +9,8 @@ import equipmentRouter from './Routes/equipmentRouter';
 import emailService from './Middleware/emailService';
 import dbConnectors from './Middleware/dbConnectors';
 import dbServices from './Middleware/dbServices';
-import { genToken, verifyPass } from './Middleware/authorization';
+import { authenticate, genToken, verifyPass } from './Middleware/authorization';
+import upload from './Middleware/upload';
 
 const app = express();
 app.use(express.json());
@@ -137,6 +138,26 @@ app.post('/api/login', (req, res) => {
                     dbConnectors.disconnect();
                 });
         });
+});
+
+app.post('/api/upload/:path', authenticate, (req, res) => {
+    const folder = req.params.path;
+
+    if(folder === 'work-audio') {
+        upload.audio(req, res, err => {
+            if(err) {
+                if((err as Error).message === 'Invalid file type') res.send('Invalid file type.');
+                else res.send('Internal server error.');
+                
+            } else {
+                const response = req.body;
+                console.log(response);
+                res.status(201).send(response);
+            }
+        });
+    }
+
+    
 });
 
 ViteExpress.listen(app, 3000, () =>

@@ -19,6 +19,10 @@ function readWorkExamples (query?: {[key:string]: unknown}) {
     else return work_examples.find().populatePaths();
 }
 
+function addWorkExample (file:string, occasions: string) {
+    return work_examples.create({file, occasions});
+}
+
 /*Bookings*/
 function readBookings (query?: {[key:string]: unknown}) {
     if(query) return main_bookings.find(query).populatePaths();
@@ -37,9 +41,23 @@ function readUploads (query?: {[key:string]: unknown}) {
     else return uploads.find().populatePaths();
 }
 
+function addUpload (fileType: string, folder: string, file: string, tag: string) {
+    const path = '/src/files/' + folder + '/' + file;
+    return uploads.create({type: fileType, path, tag});
+}
+
 /*User*/
 function readUser (query: {[key:string]: unknown}) {
     return user_data.find(query);
 }
 
-export default {readRefs, readWorkExamples, readBookings, readEquipment, readUploads, readUser};
+export default {
+    readRefs, 
+    readWorkExamples, 
+    addWorkExample,
+    readBookings, 
+    readEquipment, 
+    readUploads, 
+    addUpload,
+    readUser
+};

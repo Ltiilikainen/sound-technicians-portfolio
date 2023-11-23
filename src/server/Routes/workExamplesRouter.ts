@@ -28,17 +28,35 @@ router.get('/', (_, res) => {
 });
 
 router.post('/', authenticate, (req, res) => {
+    const body = req.body;
+    const occasions = req.body.occasions.toString();
+    
     dbConnectors.connectWriter('site-content')
         .catch(e => {
             console.log(e.message);
             res.status(500).send('Internal server error');
         })
         .then(() => {
-            dbServices.readWorkExamples()
-                .then(() => {})
-                .catch(e => res.status(500).send('Internal server error: ' + e.message));
-        })
-        .finally(() => dbConnectors.disconnect);
+            dbServices.addUpload(body.fileType, body.folder, body.file, body.tag)
+                .then(result => {
+                    console.log(result);
+                    const id_string = result._id.toString();
+                    dbServices.addWorkExample(id_string, occasions)
+                        .then(result => {
+                            result.populate('file')
+                                .then(result => res.status(201).send(result))
+                                .finally(() => dbConnectors.disconnect());
+                        })
+                        .catch(e => {
+                            res.status(500).send('Internal server error: ' + e.message);
+                            dbConnectors.disconnect();
+                        });
+                })
+                .catch(e => {
+                    res.status(500).send('Internal server error: ' + e.message);
+                    dbConnectors.disconnect();
+                });
+        });
 });
 
 router.put('/:id', authenticate, (req, res) => {
