@@ -27,16 +27,11 @@ export const authContext = createContext<AuthContextProps>({jwt: '', setJwt: nul
 function App() {
     const [jwt, setJwt] = useState('');
     const [rsaPub, setRsaPub] = useState('');
-
-    const [auth, setAuth] = useState({auth: false, username: ''});
+    const [auth, setAuth] =useState({auth: false, username: ''});
 
     useEffect(() => {
-        requestServices.verifyAdmin(jwt, rsaPub)
-            .then(data => {
-                setAuth(data);
-            });
-        console.log(auth);
-    }, [jwt]);
+        requestServices.verifyAdmin(jwt, rsaPub).then(data => setAuth(data));
+    }, [jwt, rsaPub]);
 
     return (
         <div className="App">

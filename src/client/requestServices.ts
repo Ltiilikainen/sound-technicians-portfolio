@@ -8,28 +8,32 @@ const getHomePage = () => {
     return request.then(response => response.data);
 };
 
-const getReferences = () => {
-    const request = axios.get(`${baseURL}/references`);
+/*References ports*/
+const getReferences = (id?: string) => {
+    const request = id ? axios.get(`${baseURL}/references/${id}`) : axios.get(`${baseURL}/references`);
     return request.then(response => response.data);
 };
 
-const getWorkAudio = () => {
-    const request = axios.get(`${baseURL}/work-examples`);
+/*Work examples ports*/
+const getWorkAudio = (id?: string) => {
+    const request = id ? axios.get(`${baseURL}/work-examples/${id}`) : axios.get(`${baseURL}/work-examples`);
     return request.then(response => response.data);
 };
 
-const getSchedule = () => {
-    const request = axios.get(`${baseURL}/bookings`);
+const uploadWorkAudio = (formData: FormData, token: string) => {
+    const request = axios.post(`${baseURL}/upload/work-audio`, formData, {'headers':{Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data'}});
+    return request.then(response => response);
+};
+
+/*Schedule ports*/
+const getSchedule = (id?: string) => {
+    const request = id ? axios.get(`${baseURL}/bookings/${id}`) : axios.get(`${baseURL}/bookings`);
     return request.then(response => response.data);
 };
 
-const getAllEquipment = () => {
-    const request = axios.get(`${baseURL}/equipment`);
-    return request.then(response => response.data);
-};
-
-const getOneEquipment = (id: string) => {
-    const request = axios.get(`${baseURL}/equipment/${id}`);
+/*Equipment ports*/
+const getEquipment = (id?: string) => {
+    const request = id ? axios.get(`${baseURL}/equipment/${id}`) : axios.get(`${baseURL}/equipment`);
     return request.then(response => response.data);
 };
 
@@ -38,36 +42,45 @@ const sendForm = (formData: IFormData) => {
     return request.then(response => response.data);
 };
 
+/*User actions*/
 const loginAdmin = (username:  string, password: string) => {
     const request = axios.post(`${baseURL}/login`, {username, password});
     return request.then(response => response.data);
 };
 
-const testAuth = (token: string) => {
-    const request = axios.get(`${baseURL}/bookings/test`, {headers: {'Authorization': `Bearer ${token}`}});
-    return request.then(response => response.data);
-};
+const verifyAdmin = async (token: string, rsaPub: string) => {
+    const data = {auth: false, username: ''};
 
-const verifyAdmin = (token: string, rsaPub: string) => {
-    return verify(token, rsaPub);
-    
-    async function verify (token: string, rsaPub: string) 
-    {const data = {auth: false, username: ''};
-        if(token !== '' && rsaPub && rsaPub !== '') {
-            jose.importSPKI(rsaPub, 'RS256')
-                .then(public_key => {
-                    try {
-                        data.auth = true;
-                        jose.jwtVerify(token, public_key)
-                            .then(result => data.username = String(result.payload.username));
-                    } catch (err) {
-                        console.log(err);
-                    }
-                });
-        
+    if(token !== '' && rsaPub && rsaPub !== '') {
+        const public_key = await jose.importSPKI(rsaPub, 'RS256');
+        try {
+            const verification = await jose.jwtVerify(token, public_key);
+                    
+            if(verification.payload) {
+                data.username = String(verification.payload.username);
+                data.auth = true;
+                return data;
+            } else {
+                return data;
+            }
+                       
+        } catch (err) {
+            console.log(err);
+            return data;
         }
+    }
+    else {
         return data;
     }
 };
 
-export default {getHomePage, getReferences, getWorkAudio, getSchedule, getAllEquipment, getOneEquipment, sendForm, loginAdmin, verifyAdmin, testAuth};
+export default {
+    getHomePage, 
+    getReferences, 
+    getWorkAudio,
+    uploadWorkAudio, 
+    getSchedule, 
+    getEquipment, 
+    sendForm, 
+    loginAdmin, 
+    verifyAdmin};
