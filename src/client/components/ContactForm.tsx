@@ -1,8 +1,10 @@
 import React, {useState} from 'react';
 import requestServices from '../requestServices';
+import ContactSentSuccessfully from './ContactSentSuccessfully';
 
 const ContactForm = () => {
-
+    const [success, setSuccess] = useState(false);
+    const [error, setError] = useState('');
     const [formData, setFormData] = useState<IFormData>({
         name: '',
         company: '',
@@ -25,12 +27,20 @@ const ContactForm = () => {
         if(!isFormValid) (form as HTMLFormElement).reportValidity();
         else {
             e.preventDefault();
-            requestServices.sendForm(formData);
-            console.log(formData);
+            try {
+                requestServices.sendForm(formData);
+                setSuccess(true);
+            } catch (e) {
+                setError('Something went wrong!');
+            }
         }
     };
 
     return (
+        <>
+            {success && <ContactSentSuccessfully  formData={formData}/>}
+            {!success &&
+            
         <div className="container">
             <h1>Contact me</h1>
             <div className='row text-start'>
@@ -104,6 +114,16 @@ const ContactForm = () => {
                     </div>
                 </div>
                 <textarea className='form-control mb-3' id='body' onChange={handleChange} rows={4} required></textarea>
+                <div className='row justify-content-center mb-2'>
+                    { error !== '' ?
+                        <div className='col col-5'>
+                            <div className='alert alert-danger' role='alert' id="invalid-alert">
+                                <p>{error} Please try again later.</p>
+                            </div>
+                        </div>
+                        : null
+                    }
+                </div>
                 <div className='row justify-content-center'>
                     <div className='col col-12 mb-3'>
                         <button type='submit' className='btn btn-light btn-lg w-75' onClick={handleSubmit}>Submit</button>
@@ -114,6 +134,8 @@ const ContactForm = () => {
                 </div>
             </form>
         </div>
+            }
+        </>
     );
 };
 
