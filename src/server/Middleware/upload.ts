@@ -17,8 +17,8 @@ const upload = multer({
             req.body.file = filename;
 
             if(folder === 'work-audio' && !checkFiletype(fileType, ['.mp3', '.wav', '.ogg'])) return callback(new Error('Invalid file type'), folder);
-            if(folder === 'work-video' && !checkFiletype(fileType, ['.mp3', '.wav', '.ogg'])) return callback(new Error('Invalid file type'), folder);
-            if(folder === 'img' && !checkFiletype(fileType, ['.mp3', '.wav', '.ogg'])) return callback(new Error('Invalid file type'), folder);
+            if(folder === 'work-video' && !checkFiletype(fileType, ['.mp4', '.mpeg', '.avi'])) return callback(new Error('Invalid file type'), folder);
+            if(folder === 'img' && !checkFiletype(fileType, ['.jpg', '.jpeg', '.png', '.gif', '.svg'])) return callback(new Error('Invalid file type'), folder);
 
             callback(null, filename );
         }

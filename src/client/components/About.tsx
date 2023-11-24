@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import './About.css';
-import AudioPlayer from './AudioPlayer/AudioPlayer';
 import requestServices from '../requestServices';
 import WorkExampleForm from './Admin/WorkExampleForm';
+import WorkExample from './WorkExample';
+import { authContext } from '../App';
 
 const About = () => {
+    const auth = useContext(authContext).auth;
     const [audioFiles, setAudioFiles] = useState(Array<IWorkExample>);
     const [updated, setUpdated] = useState(true);
+    const [showNewForm, setShowNewForm] = useState(false);
 
     useEffect(() => {
         if(updated) {
@@ -44,18 +47,15 @@ const About = () => {
             { audioFiles.map(file => 
             {
                 return (
-                    <div key={file._id} className='row row-cols-md-2'>
-                        <div className='col col-md-7'>
-                            <AudioPlayer audiopath={`../../${file.file.path}`}/>
-                        </div>
-                        <div className='col col-md-5 text-start pt-3'>
-                            <h3>Occasions</h3>
-                            <p>{file.occasions}</p>
-                        </div>
-                    </div>
+                    <WorkExample key={file._id} file={file} setUpdated={setUpdated} />
                 );}
             )}
-            <WorkExampleForm id={undefined} setUpdated={setUpdated} />
+            { auth.auth?
+                showNewForm ?
+                    <WorkExampleForm setUpdated={setUpdated} setShowNewForm={setShowNewForm} />
+                    : <button className='btn btn-light mb-4' onClick={() => setShowNewForm(true)}>Add new</button>
+                : null
+            }
         </div>
     );
 };

@@ -13,14 +13,16 @@
 
     margin-bottom: 2em;
 
-    background: grey;
-    background: linear-gradient(180deg, rgb(207, 206, 206) 0%, rgb(128, 126, 126) 100%);
+    background: url('../../assets/default_avatar.png');
+    background-size: contain;
+    background-color: grey;
     overflow: hidden;
 }
 
 .ref-img img {
     max-width: 80px;
     max-height: 80px;
+
 }
 
 .ref-person {

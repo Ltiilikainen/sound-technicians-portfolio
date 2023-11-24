@@ -8,10 +8,30 @@ const getHomePage = () => {
     return request.then(response => response.data);
 };
 
+const uploadImage = (formData: FormData, token: string) => {
+    const request = axios.post(`${baseURL}/upload/img`, formData, {'headers':{Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data'}});
+    return request.then(response => response);
+};
+
 /*References ports*/
 const getReferences = (id?: string) => {
     const request = id ? axios.get(`${baseURL}/references/${id}`) : axios.get(`${baseURL}/references`);
     return request.then(response => response.data);
+};
+
+const writeNewReference = (refData: {name: string, affiliation: string, content: string}, token: string, image?: {fileType: string, folder: string, file: string, tag: string}) => {
+    const request = axios.post(`${baseURL}/references`, {refData, image}, {'headers':{Authorization: `Bearer ${token}`}});
+    return request.then(response => response);
+};
+
+const updateReference = (id: string, token: string, name: string, affiliation: string, content: string, image?:string) => {
+    const request = axios.put(`${baseURL}/references/${id}`, {name, affiliation, content, image}, {'headers':{Authorization: `Bearer ${token}`}});
+    return request.then(response => response);
+};
+
+const deleteReference = (id: string, token: string) => {
+    const request = axios.delete(`${baseURL}/references/${id}`, {'headers':{Authorization: `Bearer ${token}`}});
+    return request.then(response => response);
 };
 
 /*Work examples ports*/
@@ -27,6 +47,16 @@ const uploadWorkAudio = (formData: FormData, token: string) => {
 
 const writeNewWorkAudio = (data: {fileType: string, folder: string, file: string, tag: string, occasions: string}, token: string) => {
     const request = axios.post(`${baseURL}/work-examples`, data, {'headers':{Authorization: `Bearer ${token}`}});
+    return request.then(response => response);
+};
+
+const updateWorkAudio = (id: string, token: string, file?:string, occasions?:string) => {
+    const request = axios.put(`${baseURL}/work-examples/${id}`, {file, occasions}, {'headers':{Authorization: `Bearer ${token}`}});
+    return request.then(response => response);
+};
+
+const deleteWorkAudio = (id: string, token: string) => {
+    const request = axios.delete(`${baseURL}/work-examples/${id}`, {'headers':{Authorization: `Bearer ${token}`}});
     return request.then(response => response);
 };
 
@@ -81,10 +111,19 @@ const verifyAdmin = async (token: string, rsaPub: string) => {
 
 export default {
     getHomePage, 
+    uploadImage,
+
     getReferences, 
+    writeNewReference,
+    updateReference,
+    deleteReference,
+
     getWorkAudio,
     uploadWorkAudio, 
     writeNewWorkAudio,
+    updateWorkAudio,
+    deleteWorkAudio,
+
     getSchedule, 
     getEquipment, 
     sendForm, 

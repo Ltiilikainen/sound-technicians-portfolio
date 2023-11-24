@@ -151,6 +151,22 @@ app.post('/api/upload/:path', authenticate, (req, res) => {
                 
             } else {
                 const response = req.body;
+                console.log('This is the response from the upload function');
+                console.log(response);
+                res.status(201).send(response);
+            }
+        });
+    }
+
+    if(folder === 'img') {
+        upload.img(req, res, err => {
+            if(err) {
+                if((err as Error).message === 'Invalid file type') res.send('Invalid file type.');
+                else res.send('Internal server error.');
+                
+            } else {
+                const response = req.body;
+                console.log('This is the response from the upload function');
                 console.log(response);
                 res.status(201).send(response);
             }

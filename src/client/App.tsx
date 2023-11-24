@@ -20,9 +20,10 @@ type AuthContextProps = {
     setJwt: React.Dispatch<React.SetStateAction<string>>| null,
     rsaPub: string,
     setRsaPub: React.Dispatch<React.SetStateAction<string>>| null,
+    auth: {auth: boolean, username: string}
 };
 
-export const authContext = createContext<AuthContextProps>({jwt: '', setJwt: null, rsaPub: '', setRsaPub: null});
+export const authContext = createContext<AuthContextProps>({jwt: '', setJwt: null, rsaPub: '', setRsaPub: null, auth: {auth: false, username: ''}});
 
 function App() {
     const [jwt, setJwt] = useState('');
@@ -35,7 +36,7 @@ function App() {
 
     return (
         <div className="App">
-            <authContext.Provider value={{jwt: jwt, setJwt: setJwt, rsaPub: rsaPub, setRsaPub: setRsaPub}}>
+            <authContext.Provider value={{jwt: jwt, setJwt: setJwt, rsaPub: rsaPub, setRsaPub: setRsaPub, auth: auth}}>
                 <Router>
                     <div className='sticky-top'>
                         <AdminNav username={auth.username}/>

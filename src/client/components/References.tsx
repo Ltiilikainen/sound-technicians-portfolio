@@ -1,19 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import requestServices from '../requestServices';
 import ReferenceThumb from './ReferenceThumb';
 import './References.css';
+import { authContext } from '../App';
+import ReferenceForm from './Admin/ReferenceForm';
 
 const References = () => {
+    const auth = useContext(authContext).auth;
+    const [updated, setUpdated] = useState(true);
     const [references, setReferences] = useState(Array<IReference>);
     const [workedWithImg, setWorkedWithImg] = useState('');
+    const [showNewForm, setShowNewForm] = useState(false);
 
     useEffect(() => {
-        requestServices.getReferences()
-            .then(response => {
-                setReferences(response[0]);
-                setWorkedWithImg(response[1].path);
-            });
-    }, []);
+        if(updated) {
+            requestServices.getReferences()
+                .then(response => {
+                    setReferences(response[0]);
+                    setWorkedWithImg(response[1].path);
+                    setUpdated(false);
+                });
+        }
+    }, [updated]);
 
     return (
         <div className="container">
@@ -23,7 +31,16 @@ const References = () => {
             </div>
             <h1>References</h1>
 
-            {references.length > 0 ? references.map(reference => <ReferenceThumb key={reference._id}  reference={reference}/>) : <p>loading</p>}
+            {references.length > 0 ? references.map(reference => <ReferenceThumb key={reference._id}  reference={reference} setUpdated={setUpdated}/>) : <p>loading</p>}
+
+            <>
+                {auth.auth? 
+                    <>
+                        {showNewForm ?<ReferenceForm setUpdated={setUpdated} setShowNewForm={setShowNewForm} /> : null}
+                        <button className='btn btn-light my-3' onClick={() => setShowNewForm(true)}>Add new</button>
+                    </>
+                    : null}
+            </>
         </div>
     );
 };

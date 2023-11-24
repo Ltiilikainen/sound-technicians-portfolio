@@ -41,34 +41,108 @@ router.get('/', (_, res) => {
         });
 });
 
+router.get('/:id', (req, res) => {
+    const id = req.params.id;
+    dbConnectors.connectReader()
+        .catch(e => {
+            console.log(e.message);
+            res.status(500).send('Internal server error');
+            return;
+        })
+        .then(() => {
+            dbServices.readRefs({_id:id})
+                .then(data => {
+                    res.send(data);
+                })
+                .catch(e => {
+                    console.log(e.message);
+                    res.status(500).send('Internal server error');
+                    return;
+                })
+                .finally(() => dbConnectors.disconnect());
+        });
+});
+
+type RefInput = {
+    name: string,
+    affiliation: string,
+    content: string,
+    image?: string
+}
+
 router.post('/', authenticate, (req, res) => {
+    console.log(req.body);
+    const data: RefInput = {name: req.body.refData.name, affiliation: req.body.refData.affiliation, content: req.body.refData.content};
     dbConnectors.connectWriter('site-content')
         .catch(e => {
             console.log(e.message);
             res.status(500).send('Internal server error');
         })
         .then(() => {
-            dbServices.readRefs()
-                .then(() => {})
-                .catch(e => res.status(500).send('Internal server error: ' + e.message));
-        })
-        .finally(() => dbConnectors.disconnect);
+            if(req.body.image) {
+                dbServices.addUpload(req.body.image.fileType, req.body.image.folder, req.body.image.file, req.body.image.tag)
+                    .then(result => {
+                        console.log('This is the result after writing to uploads');
+                        console.log(result);
+                        data.image = result._id.toString();})
+                    .then(() => {
+                        dbServices.addRef(data)
+                            .then((result) => {
+                                res.status(201).send(result);
+                            })
+                            .catch(e => res.status(500).send('Internal server error: ' + e.message))
+                            .finally(() => dbConnectors.disconnect());
+                    });
+            } else {
+                dbServices.addRef(data)
+                    .then((result) => {
+                        res.status(201).send(result);
+                    })
+                    .catch(e => res.status(500).send('Internal server error: ' + e.message))
+                    .finally(() => dbConnectors.disconnect());
+            }
+        });
+
 });
 
 router.put('/:id', authenticate, (req, res) => {
     const id = req.params.id;
 
+    const data:{name?: string, affiliation?: string, content?: string, image?: string} = {};
+
+    if(req.body.name) data.name = req.body.name;
+    if(req.body.affiliation) data.affiliation = req.body.affiliation;
+    if(req.body.content) data.content = req.body.content;
+
     dbConnectors.connectWriter('site-content')
         .catch(e => {
             console.log(e.message);
             res.status(500).send('Internal server error');
         })
         .then(() => {
-            dbServices.readRefs({_id: id})
-                .then(() => {})
-                .catch(e => res.status(500).send('Internal server error: ' + e.message));
-        })
-        .finally(() => dbConnectors.disconnect);
+            if(req.body.image) {
+                dbServices.addUpload(req.body.image.fileType, req.body.image.folder, req.body.image.file, req.body.image.tag)
+                    .then(result => {
+                        console.log('This is the result after writing to uploads');
+                        console.log(result);
+                        data.image = result._id.toString();})
+                    .then(() => {
+                        dbServices.updateRef(id, data)
+                            .then((result) => {
+                                res.status(201).send(result);
+                            })
+                            .catch(e => res.status(500).send('Internal server error: ' + e.message))
+                            .finally(() => dbConnectors.disconnect());
+                    });
+            } else {
+                dbServices.updateRef(id, data)
+                    .then((result) => {
+                        res.status(201).send(result);
+                    })
+                    .catch(e => res.status(500).send('Internal server error: ' + e.message))
+                    .finally(() => dbConnectors.disconnect());
+            }
+        });
 });
 
 router.delete('/:id', authenticate, (req, res) => {
@@ -80,11 +154,13 @@ router.delete('/:id', authenticate, (req, res) => {
             res.status(500).send('Internal server error');
         })
         .then(() => {
-            dbServices.readRefs({_id: id})
-                .then(() => {})
-                .catch(e => res.status(500).send('Internal server error: ' + e.message));
-        })
-        .finally(() => dbConnectors.disconnect);
+            dbServices.deleteRef(id)
+                .then((result) => {
+                    res.status(200).send(result);
+                })
+                .catch(e => res.status(500).send('Internal server error: ' + e.message))
+                .finally(() => dbConnectors.disconnect());
+        });
 });
 
 export default router;
