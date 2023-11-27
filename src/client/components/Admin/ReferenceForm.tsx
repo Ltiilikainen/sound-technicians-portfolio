@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import requestServices from '../../requestServices';
 import { authContext } from '../../App';
+import AdminButton from './AdminButton';
 
 type ReferenceFormParams = {
     id?: string | undefined,
@@ -114,6 +115,16 @@ const ReferenceForm = ({id, setUpdated, setEditMode, setShowNewForm}: ReferenceF
 
         }
     };
+
+    function handleCancel (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+        e.preventDefault();
+        setImage(null);
+        setError('');
+        form.current && form.current.reset();
+        setEditMode && setEditMode(false);
+        setShowNewForm && setShowNewForm(false);
+    }
+
     return (
         <form id="reference-form" ref={form}>
             <div className='row row-cols-2 justify-content-center mb-2'>
@@ -169,17 +180,10 @@ const ReferenceForm = ({id, setUpdated, setEditMode, setShowNewForm}: ReferenceF
             </div>
             <div className="row justify-content-center">
                 <div className="col col-sm-6 text-end">
-                    <button className='btn btn-success' onClick={handleSubmit}>Save</button>
+                    <AdminButton buttonText='Save' buttonClass='btn-primary' clickHandle={handleSubmit} />
                 </div>
                 <div className="col col-sm-6 text-start">
-                    <button className='btn btn-danger' onClick={(e) => {
-                        e.preventDefault();
-                        setImage(null);
-                        setError('');
-                        form.current && form.current.reset();
-                        setEditMode && setEditMode(false);
-                        setShowNewForm && setShowNewForm(false);
-                    }}>Cancel</button>
+                    <AdminButton buttonText='Cancel' buttonClass='btn-danger' clickHandle={handleCancel} />
                 </div>    
             </div>
         </form>

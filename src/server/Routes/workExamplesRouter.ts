@@ -52,7 +52,12 @@ router.get('/:id', (req, res) => {
 
 
 router.post('/', authenticate, (req, res) => {
-    const body = req.body;
+    const fileData: TFileData ={ 
+        fileType: req.body.fileType,
+        folder: req.body.folder,
+        file: req.body.file,
+        tag: req.body.tag
+    };
     const occasions = req.body.occasions.toString();
     
     dbConnectors.connectWriter('site-content')
@@ -61,34 +66,19 @@ router.post('/', authenticate, (req, res) => {
             res.status(500).send('Internal server error');
         })
         .then(() => {
-            dbServices.addUpload(body.fileType, body.folder, body.file, body.tag)
-                .then(result => {
-                    console.log(result);
-                    const id_string = result._id.toString();
-                    dbServices.addWorkExample(id_string, occasions)
-                        .then(result => {
-                            result.populate('file')
-                                .then(result => res.status(201).send(result))
-                                .finally(() => dbConnectors.disconnect());
-                        })
-                        .catch(e => {
-                            res.status(500).send('Internal server error: ' + e.message);
-                            dbConnectors.disconnect();
-                        });
-                })
+            //this function includes the function to add the file information to its own collection
+            dbServices.addWorkExample(fileData, occasions)
+                .then(result => res.status(201).send(result))
                 .catch(e => {
                     res.status(500).send('Internal server error: ' + e.message);
-                    dbConnectors.disconnect();
-                });
+                })
+                .finally(() =>dbConnectors.disconnect());
         });
 });
 
 router.put('/:id', authenticate, (req, res) => {
     const id = req.params.id;
     const data: {file?: string, occasions?: string} = {};
-
-    console.log('This is the req body from the upload function');
-    console.log(req.body);
 
     if(req.body.occasions && req.body.occasions !== '' ) data.occasions = req.body.occasions;
 
@@ -99,18 +89,12 @@ router.put('/:id', authenticate, (req, res) => {
         })
         .then(() => {
             if(req.body.file) {
-                dbServices.addUpload(req.body.file.fileType, req.body.file.folder, req.body.file.file, req.body.file.tag)
-                    .then(result => {
-                        console.log('This is the result after writing to uploads');
-                        console.log(result);
-                        data.file = result._id.toString();
-                    }).then(() => {
-                        console.log(data);
-                        dbServices.updateWorkExample(id, data)
-                            .then((result) => {res.status(200).send(result);})
-                            .catch(e => res.status(500).send('Internal server error: ' + e.message))
-                            .finally(() => dbConnectors.disconnect());
-                    });
+                //this function includes the function to add the file information to its own collection
+                //this function will also delete the outdated file from the server
+                dbServices.updateWorkExample(id, data, req.body.file)
+                    .then((result) => {res.status(200).send(result);})
+                    .catch(e => res.status(500).send('Internal server error: ' + e.message))
+                    .finally(() => dbConnectors.disconnect());
             } else {
                 console.log(data);
                 dbServices.updateWorkExample(id, data)
@@ -130,6 +114,7 @@ router.delete('/:id', authenticate, (req, res) => {
             res.status(500).send('Internal server error');
         })
         .then(() => {
+            //this function will also delete the associated file from the server
             dbServices.deleteWorkExample(id)
                 .then((result) => {
                     res.status(200).send(result);

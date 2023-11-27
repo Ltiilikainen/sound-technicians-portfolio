@@ -4,6 +4,7 @@ import ReferenceThumb from './ReferenceThumb';
 import './References.css';
 import { authContext } from '../App';
 import ReferenceForm from './Admin/ReferenceForm';
+import AdminButton from './Admin/AdminButton';
 
 const References = () => {
     const auth = useContext(authContext).auth;
@@ -37,7 +38,7 @@ const References = () => {
                 {auth.auth? 
                     <>
                         {showNewForm ?<ReferenceForm setUpdated={setUpdated} setShowNewForm={setShowNewForm} /> : null}
-                        <button className='btn btn-light my-3' onClick={() => setShowNewForm(true)}>Add new</button>
+                        <AdminButton buttonText='Add new' buttonClass='btn-light' clickHandle={() => setShowNewForm(true)} />
                     </>
                     : null}
             </>

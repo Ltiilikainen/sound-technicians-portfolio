@@ -3,6 +3,7 @@ import AudioPlayer from './AudioPlayer/AudioPlayer';
 import requestServices from '../requestServices';
 import WorkExampleForm from './Admin/WorkExampleForm';
 import { authContext } from '../App';
+import AdminButton from './Admin/AdminButton';
 
 type WorkExampleProps = {
     file: IWorkExample,
@@ -43,8 +44,8 @@ const WorkExample = ({file, setUpdated}: WorkExampleProps) => {
                         </>
                     }
                     <div className='col col-md-2 text-start'>
-                        {editMode ? null : <button className='mt-4 me-3 btn btn-sm btn-light' onClick={() => setEditMode(true)}>Edit</button>}
-                        <button className='mt-4 btn btn-sm btn-danger' onClick={handleDelete}>Delete</button>
+                        {editMode ? null : <AdminButton buttonText='Edit' buttonClass='btn-primary' clickHandle={() => setEditMode(true)} />}
+                        <AdminButton buttonText='Delete' buttonClass='btn-danger' clickHandle={handleDelete} />
                     </div>
                 </div>
                 :

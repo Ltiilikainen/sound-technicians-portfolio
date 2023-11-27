@@ -1,3 +1,5 @@
+/*DB return content */
+
 interface IFile {
     _id: string,
     type: string,
@@ -30,12 +32,14 @@ interface IFormData {
     body: string
 }
 
+//bookings schema
 interface IBooking {
     _id: string,
     start_date: string,
     end_date: string,
 }
 
+//main booking schema
 interface IEvent {
     _id: string,
     time_id: IBooking,
@@ -47,13 +51,6 @@ interface IEvent {
     updated_at?: unknown
 }
 
-interface ICalendarEvents {
-    title?: string,
-    start: string,
-    end: string,
-    allDay?: boolean,
-    display?: string
-}
 
 interface IEquipmentType {
     _id: string,
@@ -73,4 +70,35 @@ interface IEquipment {
     image: string | IFile,
     specs: string,
     individuals: Array<string | IEquipmentChild>
+}
+
+/*DB create/update data types*/
+
+type TFileData = {
+    fileType: string,
+    folder: string,
+    file: string,
+    tag: string
+};
+
+type TWorkExampleData = {
+    file: string,
+    occasions: string
+};
+
+type TReferenceData = {
+    name: string,
+    affiliation: string,
+    content: string,
+    image?: string
+};
+
+
+/*Frontend interfaces*/
+interface ICalendarEvents {
+    title?: string,
+    start: string,
+    end: string,
+    allDay?: boolean,
+    display?: string
 }

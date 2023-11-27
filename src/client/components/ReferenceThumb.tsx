@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { authContext } from '../App';
 import requestServices from '../requestServices';
 import ReferenceForm from './Admin/ReferenceForm';
+import AdminButton from './Admin/AdminButton';
 
 type ReferenceThumbProps = {
     reference: IReference,
@@ -47,8 +48,8 @@ const ReferenceThumb = ({reference, setUpdated} : ReferenceThumbProps) => {
                                 </div>
                             </div>
                             <div className='col col-2'>
-                                <button className='btn btn-light mt-3 me-3' onClick={() => setEditMode(true)}>Edit</button>
-                                <button className='btn btn-danger mt-3' onClick={handleDelete}>Delete</button>
+                                {editMode ? null : <AdminButton buttonText='Edit' buttonClass='btn-primary' clickHandle={() => setEditMode(true)} />}
+                                <AdminButton buttonText='Delete' buttonClass='btn-danger' clickHandle={handleDelete} />
                             </div> 
                         </div>
                 

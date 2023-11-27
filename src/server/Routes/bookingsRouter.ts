@@ -39,7 +39,7 @@ router.post('/', authenticate, (req, res) => {
                 .then(() => {})
                 .catch(e => res.status(500).send('Internal server error: ' + e.message));
         })
-        .finally(() => dbConnectors.disconnect);
+        .finally(() => dbConnectors.disconnect());
 });
 
 router.put('/:id', authenticate, (req, res) => {
@@ -55,7 +55,7 @@ router.put('/:id', authenticate, (req, res) => {
                 .then(() => {})
                 .catch(e => res.status(500).send('Internal server error: ' + e.message));
         })
-        .finally(() => dbConnectors.disconnect);
+        .finally(() => dbConnectors.disconnect());
 });
 
 router.delete('/:id', authenticate, (req, res) => {
@@ -71,7 +71,7 @@ router.delete('/:id', authenticate, (req, res) => {
                 .then(() => {})
                 .catch(e => res.status(500).send('Internal server error: ' + e.message));
         })
-        .finally(() => dbConnectors.disconnect);
+        .finally(() => dbConnectors.disconnect());
 });
 
 export default router;

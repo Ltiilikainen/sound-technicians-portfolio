@@ -13,24 +13,46 @@ function readRefs (query?: {[key:string]: unknown}) {
     else return referrers.find().populatePaths();
 }
 
-function addRef(data: {name: string, affiliation: string, content: string, image?: string}) {
-    return referrers.create(data);
+async function addRef(refData: TReferenceData, image?: TFileData) {
+    if(image) {
+        try {
+            const result = await addUpload(image);
+            refData.image = result._id.toString();
+        }
+        catch(e) {
+            console.log(e);
+            throw new Error('Adding upload to database failed');
+        }
+    }
+    return referrers.create(refData);
 }
 
-async function updateRef(id: string, data: {name?: string, affiliation?: string, content?: string, image?: string}) {
-    const referrer = await referrers.findOneAndUpdate({_id: id}, data);
+async function updateRef(id: string, refData: {name?: string, affiliation?: string, content?: string, image?: string}, image?: TFileData) {
+    if(image) {
+        try {
+            const result = await addUpload(image);
+            refData.image = result._id.toString();
+        } catch (e) {
+            console.log(e);
+            throw new Error('Adding upload to database failed');
+        }
+    }
+    
+    const referrer = await referrers.findOneAndUpdate({_id: id}, refData);
 
     if(!referrer) {
         throw new Error('Could not find document ' + id);
     } else {
-        if(data.image) {
+        if(refData.image) {
+            //delete the outdated file information from the uploads collection
             const file = await uploads.findByIdAndDelete({_id: referrer.image});
             if(!file) {
                 throw new Error('Could not find file ' + referrer.image);
             } else {
                 try {
+                    //use the file path to delete the file itself from the server
                     file && fs.unlink(`.${file.path}`, () => {
-                        return true;
+                        return referrer;
                     });
                 } catch (e) {
                     await uploads.create(file);
@@ -38,7 +60,7 @@ async function updateRef(id: string, data: {name?: string, affiliation?: string,
                 }
             }
         } else {
-            return true;
+            return referrer;
         }
     }
 }
@@ -49,11 +71,13 @@ async function deleteRef(id: string) {
         throw new Error('Could not find document ' + id);
     } else {
         if(referrer.image) {
+            //if the reference had an associated image, delete it from its collection
             const file = await uploads.findByIdAndDelete({_id: referrer.image});
             if(!file) {
                 throw new Error('Could not find file ' + referrer.image);
             } else {
                 try {
+                    //use the file path to also delete the file from the server
                     file && fs.unlink(`.${file.path}`, () => {
                         return referrer;
                     });
@@ -76,22 +100,44 @@ function readWorkExamples (query?: {[key:string]: unknown}) {
     else return work_examples.find().populatePaths();
 }
 
-function addWorkExample (file:string, occasions: string) {
-    return work_examples.create({file, occasions});
+async function addWorkExample (fileData: TFileData, occasions: string) {
+    try {
+        const result = await addUpload(fileData);
+        const file = result._id.toString();
+        return work_examples.create({file, occasions});
+    } catch(e) {
+        console.log(e);
+        throw new Error('Adding upload to database failed');
+    }
+    
 }
 
-async function updateWorkExample (id: string, data: {file?: string, occasions?: string}) {
+async function updateWorkExample (id: string, data: {file?: string, occasions?: string}, newFile?: TFileData) {
+    //add updated file to its collection if it exists
+    if(newFile) {
+        try {
+            const result = await addUpload(newFile);
+            //add updated file's ID to the data
+            data.file = result._id.toString();
+        } catch(e) {
+            console.log(e);
+            throw new Error('Adding upload to database failed');
+        }
+    }
+    
     const example = await work_examples.findOneAndUpdate({_id: id}, data);
 
     if(!example) {
         throw new Error('Could not find document ' + id);
     } else {
         if(data.file) {
+            //if file was updated, delete outdated file from database
             const file = await uploads.findByIdAndDelete({_id: example.file});
             if(!file) {
                 throw new Error('Could not find file ' + example.file);
             } else {
                 try {
+                    //use file path to also delete outdated file from server
                     file && fs.unlink(`.${file.path}`, () => {
                         return true;
                     });
@@ -103,8 +149,6 @@ async function updateWorkExample (id: string, data: {file?: string, occasions?: 
         } else {
             return true;
         }
-        console.log('This is the return value from update example');
-        console.log(example);
     }
 }
 
@@ -148,9 +192,9 @@ function readUploads (query?: {[key:string]: unknown}) {
     else return uploads.find().populatePaths();
 }
 
-function addUpload (fileType: string, folder: string, file: string, tag: string) {
-    const path = '/src/files/' + folder + '/' + file;
-    return uploads.create({type: fileType, path, tag});
+function addUpload (fileData: TFileData) {
+    const path = '/src/files/' + fileData.folder + '/' + fileData.file;
+    return uploads.create({type: fileData.fileType, path, tag: fileData.tag});
 }
 
 /*User*/
@@ -171,7 +215,9 @@ export default {
 
     readBookings, 
     readEquipment, 
+
     readUploads, 
     addUpload,
+    
     readUser
 };

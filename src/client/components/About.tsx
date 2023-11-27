@@ -4,6 +4,7 @@ import requestServices from '../requestServices';
 import WorkExampleForm from './Admin/WorkExampleForm';
 import WorkExample from './WorkExample';
 import { authContext } from '../App';
+import AdminButton from './Admin/AdminButton';
 
 const About = () => {
     const auth = useContext(authContext).auth;
@@ -53,7 +54,7 @@ const About = () => {
             { auth.auth?
                 showNewForm ?
                     <WorkExampleForm setUpdated={setUpdated} setShowNewForm={setShowNewForm} />
-                    : <button className='btn btn-light mb-4' onClick={() => setShowNewForm(true)}>Add new</button>
+                    : <AdminButton buttonText='Add new' buttonClass='btn-light' clickHandle={() => setShowNewForm(true)} />
                 : null
             }
         </div>

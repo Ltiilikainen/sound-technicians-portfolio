@@ -1,21 +1,28 @@
 import React, { useEffect, useRef, useState } from 'react';
 import requestServices from '../requestServices';
 import EquipmentTumb from './EquipmentThumb';
+import AdminButton from './Admin/AdminButton';
 import './EquipmentList.css';
+import EquipmentForm from './Admin/EquipmentForm';
 
 const EquipmentList = () => {
+    const [updated, setUpdated] = useState(true);
     const [equipment, setEquipment] = useState(Array<IEquipment>);
     const [filteredEquipment, setFilteredEquipment] = useState(Array<IEquipment>);
     const searchBarRef = useRef<HTMLInputElement>(null);
     let typeArray = ['microphone', 'PA'];
+    const [showNewForm, setShowNewForm] = useState(false);
 
     useEffect(() => {
-        requestServices.getAllEquipment()
-            .then(result => {
-                setEquipment(result);
-                setFilteredEquipment(result);
-            });
-    }, []);
+        if(updated) {
+            requestServices.getEquipment()
+                .then(result => {
+                    setEquipment(result);
+                    setFilteredEquipment(result);
+                    setUpdated(false);
+                });
+        }
+    }, [updated]);
 
     function filterEquipment () {
         const newEquipment = equipment.filter(item => 
@@ -45,6 +52,12 @@ const EquipmentList = () => {
                 <button className='btn btn-sm btn-light' onClick={() => {if(searchBarRef.current) searchBarRef.current.value = '';
                     setFilteredEquipment(() => 
                         filterEquipment());}}>Reset</button>
+            </div>
+            <div className='row justify-content-center'>
+                <div className='col col-2'>
+                    <AdminButton buttonText='Add new' buttonClass='btn-light' clickHandle={() => setShowNewForm(true)} />
+                </div>
+                {showNewForm ? <EquipmentForm setUpdated={setUpdated} setShowNewForm={setShowNewForm}/> : null}
             </div>
             <div className='row'>
                 <div className='col col-12 col-md-3'>

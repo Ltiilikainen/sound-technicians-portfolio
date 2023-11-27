@@ -14,7 +14,7 @@ const EquipmentPage = () => {
 
     useEffect(() => {
         if(id) {
-            requestServices.getOneEquipment(id)
+            requestServices.getEquipment(id)
                 .then(result => {
                     if(result === '') setError('Equipment not found');
                     else setEquipmentInfo(result[0]);

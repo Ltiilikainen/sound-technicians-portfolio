@@ -63,16 +63,14 @@ router.get('/:id', (req, res) => {
         });
 });
 
-type RefInput = {
-    name: string,
-    affiliation: string,
-    content: string,
-    image?: string
-}
 
 router.post('/', authenticate, (req, res) => {
     console.log(req.body);
-    const data: RefInput = {name: req.body.refData.name, affiliation: req.body.refData.affiliation, content: req.body.refData.content};
+    const data: TReferenceData = {
+        name: req.body.refData.name, 
+        affiliation: req.body.refData.affiliation, 
+        content: req.body.refData.content
+    };
     dbConnectors.connectWriter('site-content')
         .catch(e => {
             console.log(e.message);
@@ -80,19 +78,13 @@ router.post('/', authenticate, (req, res) => {
         })
         .then(() => {
             if(req.body.image) {
-                dbServices.addUpload(req.body.image.fileType, req.body.image.folder, req.body.image.file, req.body.image.tag)
-                    .then(result => {
-                        console.log('This is the result after writing to uploads');
-                        console.log(result);
-                        data.image = result._id.toString();})
-                    .then(() => {
-                        dbServices.addRef(data)
-                            .then((result) => {
-                                res.status(201).send(result);
-                            })
-                            .catch(e => res.status(500).send('Internal server error: ' + e.message))
-                            .finally(() => dbConnectors.disconnect());
-                    });
+                //this function includes the function to add the file information to its own collection
+                dbServices.addRef(data, req.body.image)
+                    .then((result) => {
+                        res.status(201).send(result);
+                    })
+                    .catch(e => res.status(500).send('Internal server error: ' + e.message))
+                    .finally(() => dbConnectors.disconnect());
             } else {
                 dbServices.addRef(data)
                     .then((result) => {
@@ -108,7 +100,11 @@ router.post('/', authenticate, (req, res) => {
 router.put('/:id', authenticate, (req, res) => {
     const id = req.params.id;
 
-    const data:{name?: string, affiliation?: string, content?: string, image?: string} = {};
+    const data:{
+        name?: string, 
+        affiliation?: string, 
+        content?: string, 
+        image?: string} = {};
 
     if(req.body.name) data.name = req.body.name;
     if(req.body.affiliation) data.affiliation = req.body.affiliation;
@@ -121,19 +117,14 @@ router.put('/:id', authenticate, (req, res) => {
         })
         .then(() => {
             if(req.body.image) {
-                dbServices.addUpload(req.body.image.fileType, req.body.image.folder, req.body.image.file, req.body.image.tag)
-                    .then(result => {
-                        console.log('This is the result after writing to uploads');
-                        console.log(result);
-                        data.image = result._id.toString();})
-                    .then(() => {
-                        dbServices.updateRef(id, data)
-                            .then((result) => {
-                                res.status(201).send(result);
-                            })
-                            .catch(e => res.status(500).send('Internal server error: ' + e.message))
-                            .finally(() => dbConnectors.disconnect());
-                    });
+                //this function includes the function to add the file information to its own collection
+                //this function will also delete the outdated file from the server
+                dbServices.updateRef(id, data, req.body.image)
+                    .then((result) => {
+                        res.status(201).send(result);
+                    })
+                    .catch(e => res.status(500).send('Internal server error: ' + e.message))
+                    .finally(() => dbConnectors.disconnect());
             } else {
                 dbServices.updateRef(id, data)
                     .then((result) => {
@@ -154,6 +145,7 @@ router.delete('/:id', authenticate, (req, res) => {
             res.status(500).send('Internal server error');
         })
         .then(() => {
+            //this function will also delete any associated file from the server
             dbServices.deleteRef(id)
                 .then((result) => {
                     res.status(200).send(result);
