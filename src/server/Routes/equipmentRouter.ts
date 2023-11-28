@@ -2,6 +2,7 @@ import express from 'express';
 import dbConnectors from '../Middleware/dbConnectors';
 import dbServices from '../Middleware/dbServices';
 import { authenticate } from '../Middleware/authorization';
+import equipment_types from '../Schemas/site-content/equipment_types';
 
 const router = express.Router();
 
@@ -28,7 +29,7 @@ router.get('/', (_, res) => {
         });
 });
 
-router.get('/:id', (req, res) => {
+router.get('/model/:id', (req, res) => {
     const id = req.params.id;
     dbConnectors.connectReader()
         .catch(e => {
@@ -50,18 +51,51 @@ router.get('/:id', (req, res) => {
         });
 });
 
+router.get('/types', (_, res) => {
+    dbConnectors.connectReader()
+        .catch(e => {
+            console.log(e.message);
+            res.status(500).send('Internal server error');
+        }) 
+        .then(() => {
+            equipment_types.find()
+                .then((data: unknown) => {
+                    try {
+                        res.send(data);
+                    } catch (e: unknown) {
+                        console.log((e as Error).message);
+                        res.status(500).send('Internal server error');
+                    }
+                })
+                .catch(e => res.status(500).send('Internal server error: ' + e.message))
+                .finally(() => dbConnectors.disconnect());
+        });
+}); 
+
 router.post('/', authenticate, (req, res) => {
+    console.log(req.body.data);
     dbConnectors.connectWriter('site-content')
         .catch(e => {
             console.log(e.message);
             res.status(500).send('Internal server error');
         })
         .then(() => {
-            dbServices.readEquipment()
-                .then(() => {})
-                .catch(e => res.status(500).send('Internal server error: ' + e.message));
-        })
-        .finally(() => dbConnectors.disconnect());
+            if(!req.body.file) {
+                dbServices.addEquipment(req.body.data)
+                    .then((result) => {
+                        res.status(201).send(result);
+                    })
+                    .catch(e => res.status(500).send('Internal server error: ' + e.message))
+                    .finally(() => dbConnectors.disconnect());
+            } else {
+                dbServices.addEquipment(req.body.data, req.body.file)
+                    .then((result) => {
+                        res.status(201).send(result);
+                    })
+                    .catch(e => res.status(500).send('Internal server error: ' + e.message))
+                    .finally(() => dbConnectors.disconnect());
+            }
+        });
 });
 
 router.put('/:id', authenticate, (req, res) => {
@@ -75,9 +109,9 @@ router.put('/:id', authenticate, (req, res) => {
         .then(() => {
             dbServices.readEquipment({_id: id})
                 .then(() => {})
-                .catch(e => res.status(500).send('Internal server error: ' + e.message));
-        })
-        .finally(() => dbConnectors.disconnect());
+                .catch(e => res.status(500).send('Internal server error: ' + e.message))
+                .finally(() => dbConnectors.disconnect());
+        });
 });
 
 router.delete('/:id', authenticate, (req, res) => {
@@ -91,9 +125,25 @@ router.delete('/:id', authenticate, (req, res) => {
         .then(() => {
             dbServices.readEquipment({_id: id})
                 .then(() => {})
-                .catch(e => res.status(500).send('Internal server error: ' + e.message));
+                .catch(e => res.status(500).send('Internal server error: ' + e.message))
+                .finally(() => dbConnectors.disconnect());
+        });
+});
+
+router.put('/bookings/:id', authenticate, (req, res) => {
+    const id = req.params.id;
+
+    dbConnectors.connectWriter('site-content')
+        .catch(e => {
+            console.log(e.message);
+            res.status(500).send('Internal server error');
         })
-        .finally(() => dbConnectors.disconnect());
+        .then(() => {
+            dbServices.readEquipment({_id: id})
+                .then(() => {})
+                .catch(e => res.status(500).send('Internal server error: ' + e.message))
+                .finally(() => dbConnectors.disconnect());
+        });
 });
 
 export default router;

@@ -41,10 +41,9 @@ const ReferenceForm = ({id, setUpdated, setEditMode, setShowNewForm}: ReferenceF
         if(!isFormValid) form.current && form.current.reportValidity();
         else {
             e.preventDefault();
-
+            
             const formData = new FormData();
             image && formData.append('img', image);
-
             
             if(id) {
                 console.log(id);

@@ -1,21 +1,41 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import requestServices from '../requestServices';
 import EquipmentTumb from './EquipmentThumb';
 import AdminButton from './Admin/AdminButton';
 import './EquipmentList.css';
 import EquipmentForm from './Admin/EquipmentForm';
+import { authContext } from '../App';
 
 const EquipmentList = () => {
-    const [updated, setUpdated] = useState(true);
+    const auth = useContext(authContext).auth;
+    const [types, setTypes] = useState(Array<string>);
+    const [updated, setUpdated] = useState(false);
     const [equipment, setEquipment] = useState(Array<IEquipment>);
     const [filteredEquipment, setFilteredEquipment] = useState(Array<IEquipment>);
+    let typeArray: string[] = [];
     const searchBarRef = useRef<HTMLInputElement>(null);
-    let typeArray = ['microphone', 'PA'];
     const [showNewForm, setShowNewForm] = useState(false);
+    
+    useEffect(() => {
+        requestServices.getEquipmentType()
+            .then(result => {
+                setTypes((result as IEquipmentType[]).map(type => type.type_name));
+                typeArray.concat(types);
+            }).then(() => {
+                requestServices.getEquipment()
+                    .catch(e => console.log(e.message))
+                    .then(result => {
+                        setEquipment(result);
+                        setFilteredEquipment(result);
+                    });
+            });
 
+    }, []);
+    
     useEffect(() => {
         if(updated) {
             requestServices.getEquipment()
+                .catch(e => console.log(e.message))
                 .then(result => {
                     setEquipment(result);
                     setFilteredEquipment(result);
@@ -23,6 +43,8 @@ const EquipmentList = () => {
                 });
         }
     }, [updated]);
+
+
 
     function filterEquipment () {
         const newEquipment = equipment.filter(item => 
@@ -53,12 +75,15 @@ const EquipmentList = () => {
                     setFilteredEquipment(() => 
                         filterEquipment());}}>Reset</button>
             </div>
-            <div className='row justify-content-center'>
-                <div className='col col-2'>
-                    <AdminButton buttonText='Add new' buttonClass='btn-light' clickHandle={() => setShowNewForm(true)} />
-                </div>
-                {showNewForm ? <EquipmentForm setUpdated={setUpdated} setShowNewForm={setShowNewForm}/> : null}
-            </div>
+            { auth ?
+                <div className='row justify-content-center'>
+                    {
+                        showNewForm ? 
+                            <EquipmentForm setUpdated={setUpdated} setShowNewForm={setShowNewForm}/> 
+                            : <div className='col col-2'><AdminButton buttonText='Add new' buttonClass='btn-light' clickHandle={() => setShowNewForm(true)} /></div>}
+                </div> 
+                : null
+            }
             <div className='row'>
                 <div className='col col-12 col-md-3'>
                     <div className='d-flex flex-sm-row flex-md-column text-start type-toggle mb-2'>
@@ -67,25 +92,38 @@ const EquipmentList = () => {
                                 const checks = document.getElementsByName('type');
                                 checks.forEach(check => (check as HTMLInputElement).checked = e.target.checked);
                                 if (e.target.checked) {
-                                    typeArray = ['microphone', 'PA'];
+                                    typeArray = types;
                                 } else {
                                     typeArray = [];
                                 }
                                 setFilteredEquipment(filterEquipment());
-                            }}></input><label htmlFor='microphone'>Select all</label>
+                            }}></input><label htmlFor='selectAll'>Select all</label>
                         </div>
-                        <div className='form-check form-check-inline'>
-                            <input className='form-check-inline' type='checkbox' name='type' defaultChecked={true} id='microphone' onChange={e => handleChange(e.target.checked, 'microphone')}></input><label htmlFor='microphone'>Microphone</label>
-                        </div>
-                        <div className='form-check form-check-inline'>
-                            <input className='form-check-inline' type='checkbox' name='type' defaultChecked={true}  id='PA' onChange={e => handleChange(e.target.checked, 'PA')}></input><label htmlFor='PA'>PA</label>
-                        </div>
+                        {types.map( type => <div key={type} className='form-check form-check-inline'>
+                            <input 
+                                className='form-check-inline' 
+                                type='checkbox' 
+                                name='type' 
+                                defaultChecked={true} 
+                                id={type} 
+                                onChange={e => handleChange(e.target.checked, type)}/>
+                            <label htmlFor={type}>{type}</label>
+                        </div>)}
                     </div>
                 </div>
                 <div className='col col-12 col-md-8'>
 
-                    {
-                        filteredEquipment.map(item => <EquipmentTumb key={item._id} id={item._id} name={item.name} img={item.image} specs={item.specs} individuals={item.individuals} />)
+                    {   filteredEquipment && filteredEquipment.length !== 0 ?
+                        filteredEquipment.map(item => 
+                            <EquipmentTumb 
+                                key={item._id} 
+                                id={String(item._id)} 
+                                name={item.name} 
+                                img={String(item.image)} 
+                                specs={item.specs} 
+                                individuals={item.individuals} 
+                            />)
+                        : null
                     }
                 </div>
             </div>

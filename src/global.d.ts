@@ -1,14 +1,14 @@
 /*DB return content */
 
 interface IFile {
-    _id: string,
+    _id?: string,
     type: string,
     path: string,
     tag: string
 }
 
 interface IReference {
-    _id: string,
+    _id?: string,
     name: string,
     affiliation: string,
     image: string | IFile,
@@ -16,9 +16,48 @@ interface IReference {
 }
 
 interface IWorkExample {
-    _id: string,
+    _id?: string,
     file: IFile,
     occasions: string
+}
+
+//bookings schema
+interface IBooking {
+    _id?: string,
+    start_date: string,
+    end_date: string,
+}
+
+//main booking schema
+interface IEvent {
+    _id?: string,
+    time_id: IBooking,
+    description: string,
+    display_description: boolean,
+    category_id: string,
+    equipment: Array<string>,
+    created_at?: unknown,
+    updated_at?: unknown
+}
+
+interface IEquipmentType {
+    _id?: string,
+    type_name: string
+}
+
+interface IEquipmentChild {
+    _id?: string,
+    description: string | IEquipment,
+    bookings: Array<IBooking>
+}
+
+interface IEquipment {
+    _id?: string,
+    name: string, 
+    type: string | IEquipmentType, 
+    image?: string | IFile,
+    specs: string,
+    individuals: Array<string | IEquipmentChild>
 }
 
 interface IFormData {
@@ -30,46 +69,6 @@ interface IFormData {
     startDate: Date | null,
     endDate: Date | null,
     body: string
-}
-
-//bookings schema
-interface IBooking {
-    _id: string,
-    start_date: string,
-    end_date: string,
-}
-
-//main booking schema
-interface IEvent {
-    _id: string,
-    time_id: IBooking,
-    description: string,
-    display_description: boolean,
-    category_id: string,
-    equipment: Array<string>,
-    created_at?: unknown,
-    updated_at?: unknown
-}
-
-
-interface IEquipmentType {
-    _id: string,
-    type_name: string
-}
-
-interface IEquipmentChild {
-    _id: string,
-    description: string | IEquipment,
-    bookings: Array<IBooking>
-}
-
-interface IEquipment {
-    _id: string,
-    name: string, 
-    type: string | IEquipmentType, 
-    image: string | IFile,
-    specs: string,
-    individuals: Array<string | IEquipmentChild>
 }
 
 /*DB create/update data types*/
@@ -92,6 +91,15 @@ type TReferenceData = {
     content: string,
     image?: string
 };
+
+type TEquipmentData = {
+    name: string, 
+    type: string, 
+    specs: string, 
+    quantity: string, 
+    image?: string,
+    individuals?: Array<string>;
+}
 
 
 /*Frontend interfaces*/

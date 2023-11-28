@@ -68,11 +68,38 @@ const getSchedule = (id?: string) => {
 
 /*Equipment ports*/
 const getEquipment = (id?: string) => {
-    const request = id ? axios.get(`${baseURL}/equipment/${id}`) : axios.get(`${baseURL}/equipment`);
+    const request = id ? axios.get(`${baseURL}/equipment/model/${id}`) : axios.get(`${baseURL}/equipment`);
     return request.then(response => response.data);
 };
 
-const sendForm = (formData: IFormData) => {
+const getEquipmentType = () => {
+    const request = axios.get(`${baseURL}/equipment/types`);
+    return request.then(response => response.data);
+};
+
+const addEquipment = (token:string, data: TEquipmentData, file?: TFileData) => {
+    const request = axios.post(`${baseURL}/equipment`, {data, file}, {'headers':{Authorization: `Bearer ${token}`}});
+    return request.then(response => response);
+};
+
+const updateEquipment = (id: string, token: string, data: TEquipmentData) => {
+    const request = axios.put(`${baseURL}/equipment/model/${id}`, data, {'headers':{Authorization: `Bearer ${token}`}});
+    return request.then(response => response);
+};
+
+const controlEquipmentBookings = (id: string, token: string, data: {startDate: string, endDate: string}) => {
+    const request = axios.put(`${baseURL}/equipment/bookings/${id}`, data, {'headers':{Authorization: `Bearer ${token}`}});
+    return request.then(response => response);
+};
+
+const deleteEquipment = (id: string, token: string) => {
+    const request = axios.delete(`${baseURL}/equipment/${id}`, {'headers':{Authorization: `Bearer ${token}`}});
+    return request.then(response => response);
+};
+
+/*Contact form*/
+
+const sendForm = (formData: FormData) => {
     const request = axios.post(`${baseURL}/contact`, {formData});
     return request.then(response => response.data);
 };
@@ -125,7 +152,14 @@ export default {
     deleteWorkAudio,
 
     getSchedule, 
-    getEquipment, 
+    
+    getEquipment,
+    getEquipmentType,
+    addEquipment,
+    updateEquipment,
+    controlEquipmentBookings,
+    deleteEquipment,
+
     sendForm, 
     loginAdmin, 
     verifyAdmin};

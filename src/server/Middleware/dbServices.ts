@@ -1,9 +1,12 @@
+import {Schema} from 'mongoose';
 import referrers from '../Schemas/site-content/referrers';
 import work_examples from '../Schemas/site-content/work_examples';
 import main_bookings from '../Schemas/site-content/main_bookings';
 import equipment_parents from '../Schemas/site-content/equipment_parents';
 import uploads from '../Schemas/site-content/uploads';
 import user_data from '../Schemas/user/user_data';
+import equipment_types from '../Schemas/site-content/equipment_types';
+import equipment_individuals from '../Schemas/site-content/equipment_individuals';
 import fs from 'fs';
 
 /*References*/
@@ -186,6 +189,55 @@ function readEquipment (query?: {[key:string]: unknown}) {
     else return equipment_parents.find().populatePaths();
 }
 
+async function addEquipment (data: TEquipmentData, fileData?: TFileData) {
+    console.log(data);
+    console.log(fileData);
+    const newEquipment: IEquipment = {
+        name: data.name,
+        type: '',
+        specs: data.specs,
+        individuals: []
+    };
+
+    try {
+        if(fileData) {
+            console.log('I cant read if statements lmao');
+            const result = await addUpload(fileData);
+            newEquipment.image = result._id.toString();
+        }
+        const type = await equipment_types.findOne({type_name: data.type});
+        console.log(type);
+        if(type === null) throw new Error('Equipment type unknown');
+        newEquipment.type = type._id.toString();
+
+        //initialise parent to get its ID
+        const parent = await equipment_parents.create(newEquipment);
+        const individual = await equipment_individuals.create({description: parent._id, bookings: []});
+
+        //create children and add their IDs to newEquipment
+        for(let i = 0; i < parseInt(data.quantity); i++) {
+            console.log(individual);
+            individual._id;
+            if(!individual) throw new Error('Adding individual failed');
+            newEquipment.individuals.push((individual._id as Schema.Types.ObjectId).toString());
+        }
+
+        //update parent with the array of individuals' IDs
+        return equipment_parents.findOneAndUpdate({_id: parent._id}, {individuals: newEquipment.individuals});
+    } catch(e) {
+        console.log(e);
+        throw new Error('Something went wrong');
+    }
+}
+
+function updateEquipment () {
+
+}
+
+function deleteEquipment () {
+
+}
+
 /*Uploads*/
 function readUploads (query?: {[key:string]: unknown}) {
     if(query) return uploads.find(query).populatePaths();
@@ -215,6 +267,9 @@ export default {
 
     readBookings, 
     readEquipment, 
+    addEquipment,
+    updateEquipment,
+    deleteEquipment,
 
     readUploads, 
     addUpload,

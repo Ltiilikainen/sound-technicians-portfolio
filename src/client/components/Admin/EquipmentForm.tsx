@@ -1,6 +1,8 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useContext} from 'react';
 import requestServices from '../../requestServices';
 import AdminButton from './AdminButton';
+import Select from 'react-select';
+import { authContext } from '../../App';
 
 type EquipmentFormParams = {
     id?: string | undefined,
@@ -10,26 +12,44 @@ type EquipmentFormParams = {
 };
 
 const EquipmentForm = ({id, setUpdated, setEditMode, setShowNewForm}: EquipmentFormParams) => {
+    const token = useContext(authContext).jwt;
     const [error, setError] = useState('');
     const [form, setForm] = useState(useRef<HTMLFormElement | null>(null));
+
+    const [options, setOptions] = useState<Array<{value: string, label: string}>>([]);
 
     //form values
     const [name, setName] = useState('');
     const [type, setType] = useState('');
+    const [specs, setSpecs] = useState('');
+    const [image, setImage] = useState<File | null>(null);
+    const [quantity, setQuantity] = useState('1');
 
     useEffect(() => {
         setForm(form);
-        if(id) {
-            requestServices.getEquipment(id)
-                .then((response: IEquipment[]) => {
-                    setName(response[0].name);
-                    setType((response[0].type as IEquipmentType).type_name);
-
+        requestServices.getEquipmentType()
+            .then(result => {
+                setOptions((result as IEquipmentType[]).map(type => {
+                    return {value: type.type_name, label: type.type_name};
                 })
-                .catch(e => {
-                    console.log(e.message);
-                    setError('Failed to load equipment informaiton.');});
-        }
+                );
+                if(id) {
+                    requestServices.getEquipment(id)
+                        .then((response: IEquipment[]) => {
+                            setName(response[0].name);
+                            setType((response[0].type as IEquipmentType).type_name);
+                            setSpecs(response[0].specs);
+                            setQuantity(response[0].individuals.length.toString());
+        
+                        })
+                        .catch(e => {
+                            console.log(e.message);
+                            setError('Failed to load equipment information.');});
+                }
+            })
+            .then(() => {});
+
+
     }, []);
 
     function handleSubmit(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
@@ -37,7 +57,78 @@ const EquipmentForm = ({id, setUpdated, setEditMode, setShowNewForm}: EquipmentF
         if(!isFormValid) form.current && form.current.reportValidity();
         else {
             e.preventDefault();
-            setUpdated(true);
+            const formData = new FormData();
+            image && formData.append('img', image);
+
+            if(id) {
+                if(image) {
+                    requestServices.uploadImage(formData, token)
+                        .then((response) => {
+                            requestServices.updateEquipment(id, token, {name, type, specs, quantity, image: response.data.path})
+                                .then(() => setUpdated(true))
+                                .catch((e) => {
+                                    console.log(e);
+                                    setError('Something went wrong!');
+                                })
+                                .finally(() => {
+                                    setImage(null);
+                                    form.current && form.current.reset();
+                                    setEditMode && setEditMode(false);
+                                });
+                        })
+                        .catch((e) => {
+                            console.log(e);
+                            setError('Something went wrong!');
+                        });
+                } else {
+                    requestServices.updateEquipment(id, token, {name, type, specs, quantity})
+                        .then(() => setUpdated(true))
+                        .catch((e) => {
+                            console.log(e);
+                            setError('Something went wrong!');
+                        })
+                        .finally(() => {
+                            setImage(null);
+                            form.current && form.current.reset();
+                            setEditMode && setEditMode(false);
+                        });
+                }
+            } else {
+                if(image) {
+                    requestServices.uploadImage(formData, token)
+                        .then((response) => {
+                            requestServices.addEquipment(token, {name, type, specs, quantity, image: response.data})
+                                .then(() => setUpdated(true))
+                                .catch((e) => {
+                                    console.log(e);
+                                    setError('Something went wrong!');
+                                })
+                                .finally(() => {
+                                    setImage(null);
+                                    form.current && form.current.reset();
+                                    setShowNewForm && setShowNewForm(false);
+                                });
+                        })
+                        .catch((e) => {
+                            console.log(e);
+                            setError('Something went wrong!');
+                        });
+                } else {
+                    requestServices.addEquipment(token, {name, type, specs, quantity})
+                        .then(() => setUpdated(true))
+                        .catch((e) => {
+                            console.log(e);
+                            setError('Something went wrong!');
+                        })
+                        .finally(() => {
+                            setImage(null);
+                            form.current && form.current.reset();
+                            setShowNewForm && setShowNewForm(false);
+                        });
+                }
+            }
+
+            
         }
     }
 
@@ -73,7 +164,10 @@ const EquipmentForm = ({id, setUpdated, setEditMode, setShowNewForm}: EquipmentF
                         <label htmlFor='type'>Type</label>
                     </div>
                     <div className='col col-6'>
-                        <input id='type' type='select' value={type} onChange={e => setType(e.target.value)} className='form-control' required/>
+                        <Select 
+                            options={options}
+                            onChange={selectedOption => selectedOption && setType(selectedOption?.value)}
+                        />
                     </div>
                 </div>
 
@@ -82,7 +176,7 @@ const EquipmentForm = ({id, setUpdated, setEditMode, setShowNewForm}: EquipmentF
                         <label htmlFor='specs'>Specs</label>
                     </div>
                     <div className='col col-6'>
-                        <input id='specs' className='form-control' required/>
+                        <input id='specs' value={specs} onChange={e => setSpecs(e.target.value)} className='form-control' required/>
                     </div>
                 </div>
 
@@ -92,10 +186,11 @@ const EquipmentForm = ({id, setUpdated, setEditMode, setShowNewForm}: EquipmentF
                     </div>
                     <div className='col col-6'>
                         <input 
-                            id='eq-image'
+                            id='eq-img'
                             type='file' 
                             name='img'
                             accept='.jpg, .jpeg, .png, .gif, .svg' 
+                            onChange={e => e.target.files && setImage(e.target.files[0])}
                             className='form-control'/>
                     </div>
                 </div>
@@ -105,7 +200,7 @@ const EquipmentForm = ({id, setUpdated, setEditMode, setShowNewForm}: EquipmentF
                         <label htmlFor='quantity'>Quantity</label>
                     </div>
                     <div className='col col-6'>
-                        <input id='quantity' type='number' min={1} className='form-control' required/>
+                        <input id='quantity' type='number' value={quantity} onChange={e => setQuantity(e.target.value)} min={1} className='form-control' required/>
                     </div>
                 </div>
             
