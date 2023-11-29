@@ -33,17 +33,19 @@ const Schedule = () => {
                 setSearchDate(e.target.value);
             }}></input> <button className="btn btn-light ms-1" onClick={() => scheduleRef.current?.getApi().gotoDate(Date.parse(searchDate))}>Search</button>
 
-            <div className='my-4'>
-                <FullCalendar
-                    ref={scheduleRef}
-                    viewDidMount={() => setScheduleRef(scheduleRef)}
-                    plugins={[dayGridPlugin]}
-                    initialView='dayGridMonth'
-                    weekends={true}
-                    events={events}
-                    displayEventTime={false}
-                    contentHeight={'auto'}
-                />
+            <div className='row justify-content-center my-3'>
+                <div className='col col-12 col-md-9 col-lg-6'>
+                    <FullCalendar
+                        ref={scheduleRef}
+                        viewDidMount={() => setScheduleRef(scheduleRef)}
+                        plugins={[dayGridPlugin]}
+                        initialView='dayGridMonth'
+                        weekends={true}
+                        events={events}
+                        displayEventTime={false}
+                        contentHeight={'auto'}
+                    />
+                </div>
             </div>
 
             <div className='mb-4'>

@@ -16,7 +16,7 @@ const WorkExample = ({file, setUpdated}: WorkExampleProps) => {
     const [editMode, setEditMode] = useState(false);
 
     function handleDelete() {
-        requestServices.deleteWorkAudio(file._id, token)
+        requestServices.deleteWorkAudio(String(file._id), token)
             .catch(e => console.log(e))
             .then(response => {
                 console.log(response);
@@ -30,7 +30,7 @@ const WorkExample = ({file, setUpdated}: WorkExampleProps) => {
                 <div className='row row-cols-2 row-cols-md-3'>
                     {editMode ?
                         <div className='col col-12 col-md-10'>
-                            <WorkExampleForm id={file._id.toString()} setUpdated={setUpdated} setEditMode={setEditMode} />
+                            <WorkExampleForm id={String(file._id)} setUpdated={setUpdated} setEditMode={setEditMode} />
                         </div>
                         :
                         <>
@@ -44,7 +44,7 @@ const WorkExample = ({file, setUpdated}: WorkExampleProps) => {
                         </>
                     }
                     <div className='col col-md-2 text-start'>
-                        {editMode ? null : <AdminButton buttonText='Edit' buttonClass='btn-primary' clickHandle={() => setEditMode(true)} />}
+                        {editMode ? null : <AdminButton buttonText='Edit' buttonClass='btn-secondary' clickHandle={() => setEditMode(true)} />}
                         <AdminButton buttonText='Delete' buttonClass='btn-danger' clickHandle={handleDelete} />
                     </div>
                 </div>

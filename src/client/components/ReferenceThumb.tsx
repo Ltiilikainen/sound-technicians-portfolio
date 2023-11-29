@@ -16,7 +16,7 @@ const ReferenceThumb = ({reference, setUpdated} : ReferenceThumbProps) => {
     const token = useContext(authContext).jwt;
 
     function handleDelete() {
-        requestServices.deleteReference(reference._id, token)
+        requestServices.deleteReference(String(reference._id), token)
             .catch(e => console.log(e))
             .then(response => {
                 console.log(response);
@@ -48,7 +48,7 @@ const ReferenceThumb = ({reference, setUpdated} : ReferenceThumbProps) => {
                                 </div>
                             </div>
                             <div className='col col-2'>
-                                {editMode ? null : <AdminButton buttonText='Edit' buttonClass='btn-primary' clickHandle={() => setEditMode(true)} />}
+                                {editMode ? null : <AdminButton buttonText='Edit' buttonClass='btn-secondary' clickHandle={() => setEditMode(true)} />}
                                 <AdminButton buttonText='Delete' buttonClass='btn-danger' clickHandle={handleDelete} />
                             </div> 
                         </div>

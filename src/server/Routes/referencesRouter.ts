@@ -75,6 +75,7 @@ router.post('/', authenticate, (req, res) => {
         .catch(e => {
             console.log(e.message);
             res.status(500).send('Internal server error');
+            return;
         })
         .then(() => {
             if(req.body.image) {
@@ -114,6 +115,7 @@ router.put('/:id', authenticate, (req, res) => {
         .catch(e => {
             console.log(e.message);
             res.status(500).send('Internal server error');
+            return;
         })
         .then(() => {
             if(req.body.image) {
@@ -143,6 +145,7 @@ router.delete('/:id', authenticate, (req, res) => {
         .catch(e => {
             console.log(e.message);
             res.status(500).send('Internal server error');
+            return;
         })
         .then(() => {
             //this function will also delete any associated file from the server

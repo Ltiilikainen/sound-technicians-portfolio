@@ -38,7 +38,7 @@ const AdminLogin = () => {
                         <label htmlFor="username">Username</label>
                     </div>
                     <div className='col col-sm-4'>
-                        <input id="username" className="form-control" onChange={e => setLoginUsername(e.target.value)} required></input>
+                        <input id="username" className="form-control" onChange={e => setLoginUsername(e.target.value)} required autoFocus></input>
                     </div>
                 </div>
                 <div className="row justify-content-center mb-2">

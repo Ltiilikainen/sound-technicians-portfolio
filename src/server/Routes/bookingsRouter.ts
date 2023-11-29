@@ -2,6 +2,8 @@ import express from 'express';
 import dbConnectors from '../Middleware/dbConnectors';
 import dbServices from '../Middleware/dbServices';
 import { authenticate } from '../Middleware/authorization';
+import bookings_categories from '../Schemas/site-content/bookings_categories';
+import bookings from '../Schemas/site-content/bookings';
 
 const router = express.Router();
 
@@ -14,6 +16,42 @@ router.get('/', (_, res) => {
         })
         .then(() => {
             dbServices.readBookings()
+                .then((data: unknown) => {
+                    res.send(data);
+                })
+                .catch(e => res.status(500).send('Internal server error: ' + e.message))
+                .finally(() => dbConnectors.disconnect());
+        });
+});
+
+router.get('/categories', (_, res) => {
+    dbConnectors.connectReader()
+        .catch(e => {
+            console.log(e.message);
+            res.status(500).send('Internal server error');
+            return;
+        })
+        .then(() => {
+            console.log('connected to categories');
+            bookings_categories.find()
+                .then((data: unknown) => {
+                    res.send(data);
+                })
+                .catch(e => res.status(500).send('Internal server error: ' + e.message))
+                .finally(() => {dbConnectors.disconnect();
+                    console.log('disconnected from categories');});
+        });
+});
+
+router.get('/datelist', (_, res) => {
+    dbConnectors.connectReader()
+        .catch(e => {
+            console.log(e.message);
+            res.status(500).send('Internal server error');
+            return;
+        })
+        .then(() => {
+            bookings.find()
                 .then((data: unknown) => {
                     try {
                         res.send(data);
@@ -37,9 +75,9 @@ router.post('/', authenticate, (req, res) => {
         .then(() => {
             dbServices.readBookings()
                 .then(() => {})
-                .catch(e => res.status(500).send('Internal server error: ' + e.message));
-        })
-        .finally(() => dbConnectors.disconnect());
+                .catch(e => res.status(500).send('Internal server error: ' + e.message))
+                .finally(() => dbConnectors.disconnect());
+        });
 });
 
 router.put('/:id', authenticate, (req, res) => {
@@ -53,9 +91,9 @@ router.put('/:id', authenticate, (req, res) => {
         .then(() => {
             dbServices.readBookings({_id: id})
                 .then(() => {})
-                .catch(e => res.status(500).send('Internal server error: ' + e.message));
-        })
-        .finally(() => dbConnectors.disconnect());
+                .catch(e => res.status(500).send('Internal server error: ' + e.message))
+                .finally(() => dbConnectors.disconnect());
+        });
 });
 
 router.delete('/:id', authenticate, (req, res) => {

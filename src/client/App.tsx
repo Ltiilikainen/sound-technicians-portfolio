@@ -14,6 +14,7 @@ import ContactForm from './components/ContactForm';
 import EquipmentPage from './components/EquipmentPage';
 import AdminLogin from './components/Admin/AdminLogin';
 import AdminNav from './components/Admin/AdminNav';
+import ScheduleList from './components/Admin/ScheduleList';
 
 type AuthContextProps = {
     jwt: string,
@@ -54,6 +55,7 @@ function App() {
 
                         {/*Admin routes*/}
                         <Route path='/login' element={<AdminLogin />} />
+                        <Route path='/schedule-list' element={<ScheduleList />}/>
                     </Routes>
                 </Router>
             </authContext.Provider>

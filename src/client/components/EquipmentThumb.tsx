@@ -36,7 +36,7 @@ const EquipmentTumb = ({id, name, img, specs, individuals}: EquipmentThumbProps)
                     </div>
                 </div>
                 {auth ? <div className='col col-2'>
-                    <AdminButton buttonText='Edit' buttonClass='btn-primary' clickHandle={handleClick}/>
+                    <AdminButton buttonText='Edit' buttonClass='btn-secondary' clickHandle={handleClick}/>
                 </div> : null}
             </div>
         </div>);

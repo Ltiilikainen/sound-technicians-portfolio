@@ -39,7 +39,6 @@ const EquipmentForm = ({id, setUpdated, setEditMode, setShowNewForm}: EquipmentF
                             setName(response[0].name);
                             setType((response[0].type as IEquipmentType).type_name);
                             setSpecs(response[0].specs);
-                            setQuantity(response[0].individuals.length.toString());
         
                         })
                         .catch(e => {
@@ -195,19 +194,19 @@ const EquipmentForm = ({id, setUpdated, setEditMode, setShowNewForm}: EquipmentF
                     </div>
                 </div>
 
-                <div className='row justify-content-center'>
+                {setShowNewForm && <div className='row justify-content-center'>
                     <div className='col col-4'>
                         <label htmlFor='quantity'>Quantity</label>
                     </div>
                     <div className='col col-6'>
                         <input id='quantity' type='number' value={quantity} onChange={e => setQuantity(e.target.value)} min={1} className='form-control' required/>
                     </div>
-                </div>
+                </div>}
             
 
                 <div className="row">
                     <div className="col col-sm-6">
-                        <AdminButton buttonText='Save' buttonClass='btn-primary' clickHandle={handleSubmit}/>
+                        <AdminButton buttonText='Save' buttonClass='btn-secondary' clickHandle={handleSubmit}/>
                     </div>
                     <div className="col col-sm-6">
                         <AdminButton buttonText='Cancel' buttonClass='btn-danger' clickHandle={handleCancel} />

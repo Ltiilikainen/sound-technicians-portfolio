@@ -92,6 +92,11 @@ type TReferenceData = {
     image?: string
 };
 
+type TBookingCategoryData = {
+    _id?: string,
+    category_name: string
+};
+
 type TEquipmentData = {
     name: string, 
     type: string, 

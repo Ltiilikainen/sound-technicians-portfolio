@@ -166,7 +166,7 @@ const WorkExampleForm = ({id, setUpdated, setEditMode, setShowNewForm}: WorkExam
 
             <div className="row justify-content-center mb-3">
                 <div className="col col-sm-2">
-                    <AdminButton buttonText='Save' buttonClass='btn-primary' clickHandle={handleSubmit}/>
+                    <AdminButton buttonText='Save' buttonClass='btn-success' clickHandle={handleSubmit}/>
                 </div>
                 <div className="col col-sm-2">
                     <AdminButton buttonText='Cancel' buttonClass='btn-danger' clickHandle={handleCancel} />

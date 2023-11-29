@@ -66,6 +66,15 @@ const getSchedule = (id?: string) => {
     return request.then(response => response.data);
 };
 
+const fillScheduleForm = async() => {
+    const response: {categories: Array<string>, equipment: Array<IEquipment>} = {categories: [], equipment: []};
+    response.equipment = (await axios.get(`${baseURL}/equipment`)).data;
+    const categories = (await axios.get(`${baseURL}/bookings/categories`)).data;
+    response.categories = (categories as TBookingCategoryData[]).map(item => item.category_name);
+
+    return response;
+};
+
 /*Equipment ports*/
 const getEquipment = (id?: string) => {
     const request = id ? axios.get(`${baseURL}/equipment/model/${id}`) : axios.get(`${baseURL}/equipment`);
@@ -97,9 +106,10 @@ const deleteEquipment = (id: string, token: string) => {
     return request.then(response => response);
 };
 
+
 /*Contact form*/
 
-const sendForm = (formData: FormData) => {
+const sendForm = (formData: IFormData) => {
     const request = axios.post(`${baseURL}/contact`, {formData});
     return request.then(response => response.data);
 };
@@ -152,6 +162,8 @@ export default {
     deleteWorkAudio,
 
     getSchedule, 
+
+    fillScheduleForm,
     
     getEquipment,
     getEquipmentType,

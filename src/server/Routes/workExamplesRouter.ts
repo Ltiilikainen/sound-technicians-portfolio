@@ -64,6 +64,7 @@ router.post('/', authenticate, (req, res) => {
         .catch(e => {
             console.log(e.message);
             res.status(500).send('Internal server error');
+            return;
         })
         .then(() => {
             //this function includes the function to add the file information to its own collection
@@ -86,6 +87,7 @@ router.put('/:id', authenticate, (req, res) => {
         .catch(e => {
             console.log(e.message);
             res.status(500).send('Internal server error');
+            return;
         })
         .then(() => {
             if(req.body.file) {
@@ -112,6 +114,7 @@ router.delete('/:id', authenticate, (req, res) => {
         .catch(e => {
             console.log(e.message);
             res.status(500).send('Internal server error');
+            return;
         })
         .then(() => {
             //this function will also delete the associated file from the server

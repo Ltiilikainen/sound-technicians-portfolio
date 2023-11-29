@@ -14,6 +14,7 @@ router.get('/', (_, res) => {
             return;
         })
         .then(() => {
+            console.log('connected to equipment');
             dbServices.readEquipment()
                 .then((data: unknown) => {
                     try {
@@ -25,7 +26,8 @@ router.get('/', (_, res) => {
                     }
                 })
                 .catch(e => res.status(500).send('Internal server error: ' + e.message))
-                .finally(() => dbConnectors.disconnect());
+                .finally(() => {dbConnectors.disconnect();
+                    console.log('disconnected from equipment');});
         });
 });
 
@@ -35,6 +37,7 @@ router.get('/model/:id', (req, res) => {
         .catch(e => {
             console.log(e.message);
             res.status(500).send('Internal server error');
+            return;
         })
         .then(() => {
             dbServices.readEquipment({_id: id})
@@ -56,6 +59,7 @@ router.get('/types', (_, res) => {
         .catch(e => {
             console.log(e.message);
             res.status(500).send('Internal server error');
+            return;
         }) 
         .then(() => {
             equipment_types.find()
@@ -78,6 +82,7 @@ router.post('/', authenticate, (req, res) => {
         .catch(e => {
             console.log(e.message);
             res.status(500).send('Internal server error');
+            return;
         })
         .then(() => {
             if(!req.body.file) {
@@ -105,6 +110,7 @@ router.put('/:id', authenticate, (req, res) => {
         .catch(e => {
             console.log(e.message);
             res.status(500).send('Internal server error');
+            return;
         })
         .then(() => {
             dbServices.readEquipment({_id: id})
@@ -121,6 +127,7 @@ router.delete('/:id', authenticate, (req, res) => {
         .catch(e => {
             console.log(e.message);
             res.status(500).send('Internal server error');
+            return;
         })
         .then(() => {
             dbServices.readEquipment({_id: id})
@@ -137,6 +144,7 @@ router.put('/bookings/:id', authenticate, (req, res) => {
         .catch(e => {
             console.log(e.message);
             res.status(500).send('Internal server error');
+            return;
         })
         .then(() => {
             dbServices.readEquipment({_id: id})

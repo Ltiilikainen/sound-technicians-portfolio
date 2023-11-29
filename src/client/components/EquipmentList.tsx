@@ -7,7 +7,7 @@ import EquipmentForm from './Admin/EquipmentForm';
 import { authContext } from '../App';
 
 const EquipmentList = () => {
-    const auth = useContext(authContext).auth;
+    const auth = useContext(authContext).auth.auth;
     const [types, setTypes] = useState(Array<string>);
     const [updated, setUpdated] = useState(false);
     const [equipment, setEquipment] = useState(Array<IEquipment>);

@@ -179,7 +179,7 @@ const ReferenceForm = ({id, setUpdated, setEditMode, setShowNewForm}: ReferenceF
             </div>
             <div className="row justify-content-center">
                 <div className="col col-sm-6 text-end">
-                    <AdminButton buttonText='Save' buttonClass='btn-primary' clickHandle={handleSubmit} />
+                    <AdminButton buttonText='Save' buttonClass='btn-success' clickHandle={handleSubmit} />
                 </div>
                 <div className="col col-sm-6 text-start">
                     <AdminButton buttonText='Cancel' buttonClass='btn-danger' clickHandle={handleCancel} />
