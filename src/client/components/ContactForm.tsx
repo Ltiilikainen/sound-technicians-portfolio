@@ -1,4 +1,6 @@
 import React, {useState} from 'react';
+import TextInput from './Inputs/TextInput';
+import DateInput from './Inputs/DateInput';
 import requestServices from '../requestServices';
 import ContactSentSuccessfully from './ContactSentSuccessfully';
 
@@ -49,46 +51,42 @@ const ContactForm = () => {
             <form className='form-group' id='contact'>
                 <div className='row row-cols-md-2 my-3'>
                     <div className='col col-md-6 text-start'>
-                        <div className='form-group row align-items-start'>
-                            <div className='col-3'>
-                                <label className='form-label' htmlFor="name">Name *</label>
-                            </div>
-                            <div className='col'>
-                                <input className='form-control' onChange={handleChange} id="name" required></input>
-                            </div>
-                        </div>
+                        <TextInput 
+                            inputId='name'
+                            label='Name *'
+                            onChange={handleChange}
+                            required={true}
+                            autofocus={true}
+                        />
                     </div>
                     <div className='col col-md-6 text-start'>
                         <div className='form-group row align-items-start'>
-                            <div className='col-auto'>
-                                <label className='form-label' htmlFor="company">Company</label>
-                            </div>
-                            <div className='col'>
-                                <input className='form-control' onChange={handleChange} id="company"></input>
-                            </div>
+                            <TextInput 
+                                inputId='company'
+                                label='Company'
+                                onChange={handleChange}
+                            />
                         </div>
                     </div>
                 </div>
                 <div className='row row-cols-md-2 mb-3'>
                     <div className='col col-md-6 text-start'>
-                        <div className='form-group row align-items-start'>
-                            <div className='col-3'>
-                                <label className='form-label' htmlFor="email">Email *</label>
-                            </div>
-                            <div className='col'>
-                                <input className='form-control' onChange={handleChange} type="email" id="email" required></input>
-                            </div>
-                        </div>
+                        <TextInput 
+                            inputId='email'
+                            label='Email *'
+                            type='email'
+                            onChange={handleChange}
+                            required={true}
+                        />
                     </div>
                     <div className='col col-md-6 text-start'>
-                        <div className='form-group row align-items-start'>
-                            <div className='col-3'>
-                                <label className='form-label' htmlFor="phone">Phone *</label>
-                            </div>
-                            <div className='col'>
-                                <input className='form-control' onChange={handleChange} type='telephone' id="phone" required></input>
-                            </div>
-                        </div>
+                        <TextInput 
+                            inputId='phone'
+                            label='Phone *'
+                            type='telephone'
+                            onChange={handleChange}
+                            required={true}
+                        />
                     </div>
                 </div>
                 <div className='form-group row align-items-start'>
@@ -102,15 +100,18 @@ const ContactForm = () => {
                 <div className='row'>
                     <label className='form-label' htmlFor='dates'>Dates</label>
                 </div>
-                <div className='row row-cols-3 mb-4 justify-content-center'>
-                    <div className='col col-5 d-flex justify-content-end'>
-                        <input className='form-control w-50' onChange={handleChange} type='date' name='dates' id='startDate'></input>
+                <div className='row mb-4'>
+                    <div className="col">
+                        <DateInput 
+                            inputId='start-date'
+                            onChange={handleChange}
+                        />
                     </div>
-                    <div className='col col-1'>
-                        <span>-</span>
-                    </div>
-                    <div className='col col-5'>
-                        <input className='form-control w-50' onChange={handleChange} type='date' name='dates' id='endDate'></input>
+                    <div className="col">
+                        <DateInput 
+                            inputId='end-date'
+                            onChange={handleChange}
+                        />
                     </div>
                 </div>
                 <textarea className='form-control mb-3' id='body' onChange={handleChange} rows={4} required></textarea>

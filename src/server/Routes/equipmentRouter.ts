@@ -22,7 +22,6 @@ router.get('/', (_, res) => {
                     } catch (e: unknown) {
                         console.log((e as Error).message);
                         res.status(500).send('Internal server error');
-                        return;
                     }
                 })
                 .catch(e => res.status(500).send('Internal server error: ' + e.message))

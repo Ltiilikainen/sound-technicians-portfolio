@@ -79,10 +79,10 @@ const EquipmentPage = () => {
             </div> 
                 : null}
             <div className='row justify-content-center'>
-                <div className='col text-end'>
-                    <input id="datesearch" type="date" ref={dateRef}></input> 
+                <div className='col col-auto text-end'>
+                    <input id="datesearch" type="date" className='form-control' ref={dateRef}></input> 
                 </div>
-                <div className='col text-start'>
+                <div className='col col-auto text-start'>
                     <button className="btn btn-light ms-1" onClick={() => setSearchDate(dateRef.current? dateRef.current.value : new Date(Date.now()).toISOString())}>Search</button>
                 </div>
             </div>

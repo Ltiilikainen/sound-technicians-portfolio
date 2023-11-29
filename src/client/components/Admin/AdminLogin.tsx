@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import requestServices from '../../requestServices';
 import { authContext } from '../../App';
 import { Navigate } from 'react-router-dom';
+import TextInput from '../Inputs/TextInput';
 
 const AdminLogin = () => {
     const [success, setSuccess] = useState(false);
@@ -34,23 +35,26 @@ const AdminLogin = () => {
             {success && (<Navigate to='/' replace={true} />)}
             <form id="login" className='form-group'>
                 <div className="row justify-content-center mb-2">
-                    <div className='col col-sm-2 text-end'>
-                        <label htmlFor="username">Username</label>
-                    </div>
-                    <div className='col col-sm-4'>
-                        <input id="username" className="form-control" onChange={e => setLoginUsername(e.target.value)} required autoFocus></input>
-                    </div>
+                    <TextInput 
+                        inputId='username'
+                        label='Username'
+                        value=''
+                        onChange={e => setLoginUsername(e.target.value)}
+                        required={true}
+                        autofocus={true}
+                    />
                 </div>
                 <div className="row justify-content-center mb-2">
-                    <div className='col col-sm-2 text-end'>
-                        <label htmlFor="password">Password</label>
-                    </div>
-                    <div className='col col-sm-4'>
-                        <input type="password" id="password" className="form-control" onChange={e => setPassword(e.target.value)} required></input>
-                    </div>
+                    <TextInput 
+                        inputId='password'
+                        label='Password'
+                        type='password'
+                        value=''
+                        onChange={e => setPassword(e.target.value)}
+                        required={true}
+                    />
                 </div>
                 <div className='row justify-content-center'>
-                    <div className='col col-sm-2'></div>
                     <div className='col col-sm-4'>
                         <div className='alert alert-danger' role='alert' id="invalid-alert" style={{visibility: 'hidden'}}>Incorrect username or password</div>
                     </div>

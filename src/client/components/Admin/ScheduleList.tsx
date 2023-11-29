@@ -15,7 +15,10 @@ const ScheduleList = () => {
         if(updated)
         {
             requestServices.getSchedule()
-                .catch(e => console.log(e))
+                .catch(e => {
+                    console.log(e);
+                    setUpdated(true);
+                })
                 .then(schedule => {
                     setSchedule(schedule);
                 
@@ -23,9 +26,13 @@ const ScheduleList = () => {
                         .then(response => {
                             setCategories(response.categories.map(item => {return {value: item, label: item};}));
                             setEquipment(response.equipment);
+                            setUpdated(false);
                         
                         })
-                        .catch(e => console.log(e));
+                        .catch(e => {
+                            console.log(e);
+                            setUpdated(true);
+                        });
                 });
         }
     }, [updated]);

@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import AdminButton from './AdminButton';
+import DateInput from '../Inputs/DateInput';
 import Select from 'react-select';
 
 type EquipmentBookingFormProps = {
@@ -8,6 +9,9 @@ type EquipmentBookingFormProps = {
 }
 
 const EquipmentBookingForm = ({id, setShowBookingForm}: EquipmentBookingFormProps) => {
+    const [start, setStart] = useState('');
+    const [end, setEnd] = useState('');
+
     useEffect(() => {
         console.log(id);
     }, []);
@@ -24,7 +28,6 @@ const EquipmentBookingForm = ({id, setShowBookingForm}: EquipmentBookingFormProp
         e.preventDefault();
         setShowBookingForm(false);
     }
-    
 
     const options = [
         {value: '22-1-23 - 24-1-23', label: '22-1-23 - 24-1-23'},
@@ -48,8 +51,24 @@ const EquipmentBookingForm = ({id, setShowBookingForm}: EquipmentBookingFormProp
                     <div className='row'>
                         <div className='col'>
                             <p>Create new</p>
-                            <input type="date" placeholder="Start" />
-                            <input type="date" placeholder="End" />
+                            <div className="row">
+                                <div className="col">
+                                    <DateInput 
+                                        inputId='start-date'
+                                        label='Start date'
+                                        value={start}
+                                        onChange={e => setStart(e.target.value)}
+                                    />
+                                </div>
+                                <div className="col">
+                                    <DateInput 
+                                        inputId='end-date'
+                                        label='End date'
+                                        value={end}
+                                        onChange={e => setEnd(e.target.value)}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div className='row'>

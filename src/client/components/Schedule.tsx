@@ -28,10 +28,14 @@ const Schedule = () => {
         <div className="container">
             <h1>Schedule</h1>
 
-            
-            <input id="datesearch" type="date" onChange={e => {
-                setSearchDate(e.target.value);
-            }}></input> <button className="btn btn-light ms-1" onClick={() => scheduleRef.current?.getApi().gotoDate(Date.parse(searchDate))}>Search</button>
+            <div className='row justify-content-center'>
+                <div className='col col-auto text-end'>
+                    <input id="datesearch" type="date" className='form-control' onChange={e => setSearchDate(e.target.value)}></input> 
+                </div>
+                <div className='col col-auto text-start'>
+                    <button className="btn btn-light ms-1" onClick={() => scheduleRef.current?.getApi().gotoDate(Date.parse(searchDate))}>Search</button>
+                </div>
+            </div>
 
             <div className='row justify-content-center my-3'>
                 <div className='col col-12 col-md-9 col-lg-6'>
