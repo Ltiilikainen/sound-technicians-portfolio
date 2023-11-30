@@ -1,4 +1,4 @@
-import {Schema} from 'mongoose';
+import {Types} from 'mongoose';
 import referrers from '../Schemas/site-content/referrers';
 import work_examples from '../Schemas/site-content/work_examples';
 import main_bookings from '../Schemas/site-content/main_bookings';
@@ -8,6 +8,7 @@ import user_data from '../Schemas/user/user_data';
 import equipment_types from '../Schemas/site-content/equipment_types';
 import equipment_individuals from '../Schemas/site-content/equipment_individuals';
 import fs from 'fs';
+import { isArray } from 'util';
 
 /*References*/
 function readRefs (query?: {[key:string]: unknown}) {
@@ -212,17 +213,12 @@ async function addEquipment (data: TEquipmentData, fileData?: TFileData) {
 
         //initialise parent to get its ID
         const parent = await equipment_parents.create(newEquipment);
-        const individual = await equipment_individuals.create({description: parent._id, bookings: []});
 
-        //create children and add their IDs to newEquipment
-        for(let i = 0; i < parseInt(data.quantity); i++) {
-            console.log(individual);
-            individual._id;
-            if(!individual) throw new Error('Adding individual failed');
-            newEquipment.individuals.push((individual._id as Schema.Types.ObjectId).toString());
-        }
-
-        //update parent with the array of individuals' IDs
+        //create individuals
+        const individuals = await addIndividuals(parent._id, data.quantity);
+        
+        individuals.forEach(item => newEquipment.individuals.push(String(item._id)));
+        //update parent with the array of the new individuals' IDs
         return equipment_parents.findOneAndUpdate({_id: parent._id}, {individuals: newEquipment.individuals});
     } catch(e) {
         console.log(e);
@@ -230,12 +226,194 @@ async function addEquipment (data: TEquipmentData, fileData?: TFileData) {
     }
 }
 
-function updateEquipment () {
+async function addIndividuals(parent_id: Types.ObjectId, quantity: string,) {
+    const individualArray: {description: string, bookings: Array<string>}[] =  [];
+
+    for(let i = 0; i < parseInt(quantity); i++) {
+        individualArray.push({description: parent_id.toString(), bookings: []});
+    }
+
+    const individuals = await equipment_individuals.create(individualArray);
+    return individuals;        
+}
+
+async function updateEquipment(id: string, data?: TEquimpentUpdateData, individualData?: TEquipmentIndividualFieldData) {
+    const updatedData = {
+        name: data?.name,
+        specs: data?.specs
+    };
+    
+    if(!individualData) {
+        console.log(data);
+        console.log(updatedData);
+        const equipment = equipment_parents.findOneAndUpdate({_id:id}, updatedData);
+        if(!equipment) throw new Error('Equipment not found');
+        return equipment;
+    } else {
+        const equipment = await equipment_parents.findById({_id: id});
+        if(!equipment) throw new Error('Couldn\'t find equipment');
+
+        let individuals = equipment.individuals;
+        
+        if(individualData.newIndividuals) {
+            const newIndividuals = await addIndividuals(equipment._id, individualData.newIndividuals);
+            const newIds = newIndividuals.map(item => {
+                if(item._id === undefined) throw new Error('Invalid individual ID');
+                return (item._id as Types.ObjectId);
+            });
+            console.log(newIds);
+            individuals = individuals.concat(newIds);
+        }
+
+        if(individualData.removedIndividuals) {
+            try {
+                const deleted = await deleteIndividuals(equipment._id, individualData.removedIndividuals);
+                if(!isArray(deleted)) throw new Error('Deleted IDs invalid');
+                const deletedIds = deleted.map(item => item._id);
+
+                deletedIds.forEach(item => {
+                    const index = individuals.indexOf(item);
+                    individuals.splice(index, 1);
+                });
+
+            } catch(e) {
+                console.log((e as Error).message);
+                throw new Error('Failed to delete individuals');
+            }   
+        }
+        console.log(individuals);
+
+        if(!data){ 
+            const equipment = equipment_parents.findByIdAndUpdate({_id: id}, {individuals: individuals});
+            if(!equipment) throw new Error('Equipment not found');
+            return equipment;
+        }
+
+        const eq = equipment_parents.findByIdAndUpdate({_id: id}, {...updatedData, individuals});
+        if(!eq) throw new Error('Equipment not found');
+        return eq;
+    }
+}
+
+async function updateIndividual(id: string, data: TIndividualUpdateData) {
+    let individual:unknown;
+    if(data.removedBookings) {
+        try {
+            individual = await deleteEquipmentBookings(id, data.removedBookings);
+        }catch (e) {
+            console.log((e as Error).message);
+            throw new Error('Failed to update individual at delete bookings');
+        }
+    }
+    if(data.newBookings) {
+        try {
+            individual = await addEquipmentBookings(id, data.newBookings);
+        }catch (e) {
+            console.log((e as Error).message);
+            throw new Error('Failed to update individual at add bookings');
+        }
+    }
+    return (individual as TIndividualSchema);
+}
+
+async function addEquipmentBookings(equipmentId: string, bookingIds: string[]) {
+    const equipment = equipment_individuals.findOne({_id: equipmentId});
+    if(!equipment) throw new Error('Couldn\'t find equipment');
+
+    const newBookings: Array<IBooking | string> = ((equipment as unknown) as IEquipmentChild).bookings;
+    try {
+        newBookings.concat(bookingIds);
+    } catch(e) {
+        console.log((e as Error).message);
+        throw new Error('Failed to add bookings to equipment');
+    }
+    try {
+        const updatedIndividual = equipment_individuals.findOneAndUpdate({_id: equipmentId}, {bookings: newBookings});
+        return(updatedIndividual);
+    } catch (e) {
+        console.log((e as Error).message);
+        throw new Error('Failed to add bookings to equipment');
+    }
+}
+
+async function deleteEquipmentBookings(equipmentId: string, bookingIds: string[]) {
+    const equipment = equipment_individuals.findOne({_id: equipmentId});
+    if(!equipment) throw new Error('Couldn\'t find equipment');
+
+    const newBookings: Array<IBooking | string> = ((equipment as unknown) as IEquipmentChild).bookings;
+    try {
+        bookingIds.forEach(item => {
+            const index = newBookings.indexOf(item);
+            newBookings.splice(index, 1);
+        });
+    } catch(e) {
+        console.log((e as Error).message);
+        throw new Error('Failed to delete bookings from equipment');
+    }
+    try {
+        const updatedIndividual = equipment_individuals.findOneAndUpdate({_id: equipmentId}, {bookings: newBookings});
+        return(updatedIndividual);
+    } catch (e) {
+        console.log((e as Error).message);
+        throw new Error('Failed to delete bookings from equipment');
+    }
 
 }
 
-function deleteEquipment () {
+async function deleteEquipment(id: string) {
+    const equipment = await equipment_parents.findOneAndDelete({_id: id});
 
+    if(!equipment) {
+        throw new Error(`Couldn't find equipment ${id}`);
+    //if equipment image exists, find the file and delete
+    } else  if(equipment.image) {
+        const file = await uploads.findOneAndDelete({_id: equipment.image});
+        if(!file) {
+            throw new Error('Could not find file ' + equipment.image);
+        } else {
+            try {
+                file && fs.unlink(`.${file.path}`, () => {
+                    return true;
+                });
+            } catch (e) {
+                throw new Error('File deletion failed');
+            }
+        }
+    }
+    try {
+        const individuals = await deleteIndividuals(equipment._id);
+        return individuals;
+    } catch (e) {
+        console.log((e as Error).message);
+        throw new Error('Couldn\'t delete individuals');
+    }
+}
+
+async function deleteIndividuals(parentId: Types.ObjectId, inIds?: string[]) {
+    if(!inIds) {
+        const allIndividuals = await equipment_individuals.find({description: parentId});
+        if(allIndividuals.length < 1) throw new Error('Could not find individuals');
+        const deleted = await equipment_individuals.deleteMany({description: parentId});
+        return deleted;
+    } else {
+        const deleted: unknown[] = [];
+        inIds.forEach(item => {
+            console.log(item);
+            equipment_individuals.findByIdAndDelete({_id: item})
+                .then(individual => {
+                    if(!individual) throw new Error('Individual not found');
+                    console.log(individual);
+                    deleted.push(individual);
+                })
+                .catch(e => {
+                    console.log(e.message);
+                    throw new Error('Could not delete individual ' + item);
+                });
+        });
+        console.log('deleted array');
+        console.log(deleted);
+        return (deleted as TIndividualSchema[]);
+    }
 }
 
 /*Uploads*/
@@ -266,9 +444,11 @@ export default {
     deleteWorkExample,
 
     readBookings, 
+
     readEquipment, 
     addEquipment,
     updateEquipment,
+    updateIndividual,
     deleteEquipment,
 
     readUploads, 

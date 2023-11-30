@@ -76,7 +76,6 @@ router.get('/types', (_, res) => {
 }); 
 
 router.post('/', authenticate, (req, res) => {
-    console.log(req.body.data);
     dbConnectors.connectWriter('site-content')
         .catch(e => {
             console.log(e.message);
@@ -102,8 +101,13 @@ router.post('/', authenticate, (req, res) => {
         });
 });
 
-router.put('/:id', authenticate, (req, res) => {
+router.put('/model/:id', authenticate, (req, res) => {
     const id = req.params.id;
+
+    console.log(req.body);
+
+    const data = req.body.data;
+    const individualData = req.body.individualData;
 
     dbConnectors.connectWriter('site-content')
         .catch(e => {
@@ -112,14 +116,35 @@ router.put('/:id', authenticate, (req, res) => {
             return;
         })
         .then(() => {
-            dbServices.readEquipment({_id: id})
+            dbServices.updateEquipment(id, data, individualData)
+                .then((result) => {
+                    console.log(result);
+                    res.status(200).send(result);
+                })
+                .catch(e => res.status(500).send('Internal server error: ' + e.message))
+                .finally(() => dbConnectors.disconnect());
+        });
+});
+
+router.put('/child/:id', authenticate, (req, res) => {
+    const id = req.params.id;
+    const data: TIndividualUpdateData = JSON.parse(req.params.data);
+    
+    dbConnectors.connectWriter('site-content')
+        .catch(e => {
+            console.log(e.message);
+            res.status(500).send('Internal server error');
+            return;
+        })
+        .then(() => {
+            dbServices.updateIndividual(id, data)
                 .then(() => {})
                 .catch(e => res.status(500).send('Internal server error: ' + e.message))
                 .finally(() => dbConnectors.disconnect());
         });
 });
 
-router.delete('/:id', authenticate, (req, res) => {
+router.delete('/model/:id', authenticate, (req, res) => {
     const id = req.params.id;
 
     dbConnectors.connectWriter('site-content')
@@ -129,8 +154,10 @@ router.delete('/:id', authenticate, (req, res) => {
             return;
         })
         .then(() => {
-            dbServices.readEquipment({_id: id})
-                .then(() => {})
+            dbServices.deleteEquipment(id)
+                .then((result) => {
+                    res.status(200).send(result);
+                })
                 .catch(e => res.status(500).send('Internal server error: ' + e.message))
                 .finally(() => dbConnectors.disconnect());
         });

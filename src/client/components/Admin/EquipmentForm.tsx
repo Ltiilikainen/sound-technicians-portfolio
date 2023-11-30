@@ -158,7 +158,7 @@ const EquipmentForm = ({id, setUpdated, setEditMode, setShowNewForm}: EquipmentF
                     </div>
                 </div>
 
-                <div className='row justify-content-center'>
+                {setShowNewForm && <div className='row justify-content-center'>
                     <div className='col col-4'>
                         <label htmlFor='type'>Type</label>
                     </div>
@@ -168,7 +168,7 @@ const EquipmentForm = ({id, setUpdated, setEditMode, setShowNewForm}: EquipmentF
                             onChange={selectedOption => selectedOption && setType(selectedOption?.value)}
                         />
                     </div>
-                </div>
+                </div>}
 
                 <div className='row justify-content-center'>
                     <div className='col col-4'>

@@ -91,18 +91,18 @@ const addEquipment = (token:string, data: TEquipmentData, file?: TFileData) => {
     return request.then(response => response);
 };
 
-const updateEquipment = (id: string, token: string, data: TEquipmentData) => {
+const updateEquipment = (id: string, token: string, data?: TEquipmentData, individualData?: TEquipmentIndividualFieldData) => {
+    const request = axios.put(`${baseURL}/equipment/model/${id}`, {data, individualData}, {'headers':{Authorization: `Bearer ${token}`}});
+    return request.then(response => response);
+};
+
+const updateChild = (id: string, token: string, data: TIndividualUpdateData) => {
     const request = axios.put(`${baseURL}/equipment/model/${id}`, data, {'headers':{Authorization: `Bearer ${token}`}});
     return request.then(response => response);
 };
 
-const controlEquipmentBookings = (id: string, token: string, data: {startDate: string, endDate: string}) => {
-    const request = axios.put(`${baseURL}/equipment/bookings/${id}`, data, {'headers':{Authorization: `Bearer ${token}`}});
-    return request.then(response => response);
-};
-
 const deleteEquipment = (id: string, token: string) => {
-    const request = axios.delete(`${baseURL}/equipment/${id}`, {'headers':{Authorization: `Bearer ${token}`}});
+    const request = axios.delete(`${baseURL}/equipment/model/${id}`, {'headers':{Authorization: `Bearer ${token}`}});
     return request.then(response => response);
 };
 
@@ -169,7 +169,7 @@ export default {
     getEquipmentType,
     addEquipment,
     updateEquipment,
-    controlEquipmentBookings,
+    updateChild,
     deleteEquipment,
 
     sendForm, 

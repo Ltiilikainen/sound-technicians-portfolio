@@ -106,6 +106,30 @@ type TEquipmentData = {
     individuals?: Array<string>;
 }
 
+type TEquimpentUpdateData = {
+    name: string,
+    type: string,
+    specs: string,
+    image?: string,
+}
+
+type TEquipmentIndividualFieldData = {
+    newIndividuals?: string,
+    removedIndividuals?: string[]
+}
+
+type TIndividualUpdateData = {
+    newBookings?: string[],
+    removedBookings?: string[]
+}
+
+type TIndividualSchema = {
+    _id: Types.ObjectId,
+    description: Types.ObjectId,
+    bookings: Types.ObjectId[],
+    _v?: unknown
+}
+
 
 /*Frontend interfaces*/
 interface ICalendarEvents {

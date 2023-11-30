@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import requestServices from '../requestServices';
 import EquipmentInfo from './EquipmentInfo';
@@ -11,14 +11,18 @@ import EquipmentBookingForm from './Admin/EquipmentBookingForm';
 
 const EquipmentPage = () => {
     const auth = useContext(authContext).auth.auth;
+    const token = useContext(authContext).jwt;
     const [editMode, setEditMode] = useState(false);
     const [updated, setUpdated] = useState(true);
+    const [deleted, setDeleted] = useState(false);
     const {id} = useParams();
     const [equipmentInfo, setEquipmentInfo] = useState<IEquipment | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [dateRef, setDateRef] = useState(useRef<HTMLInputElement>(null));
     const [searchDate, setSearchDate] = useState(new Date(Date.now()).toISOString());
     const [showBookingForm, setShowBookingForm] = useState(false);
+
+    const [deleteArray, setDeleteArray] = useState<Array<string>>([]);
 
     useEffect(() => {
         if(updated) {
@@ -31,28 +35,63 @@ const EquipmentPage = () => {
                     if(result === '') setError('Equipment not found');
                     else setEquipmentInfo(result[0]);
                     console.log(result);
+                    setUpdated(false);
                 }
                 );
         } else {
             setError('Equipment not found');
         }
         setDateRef(dateRef);
-    }, []);
+    }, [updated]);
 
     function handleDelete () {
-
+        requestServices.deleteEquipment(String(equipmentInfo?._id), token)
+            .then(() => {
+                setDeleted(true);
+            })
+            .catch(e => {
+                console.log(e.message);
+                setError('Something went wrong!');
+            });
     }
 
     function handleChildAdd () {
-
+        requestServices.updateEquipment(String(equipmentInfo?._id), token, undefined, {newIndividuals: '1', removedIndividuals: undefined})
+            .then(() => {
+                setUpdated(true);
+            })
+            .catch(e => {
+                console.log(e.message);
+                setError('Something went wrong!');
+            });
     }
     
-    function handleChildDelete () {
+    function handleChildDelete (id: string | undefined) {
+        if(!id) {
+            setError('Couldn\'t find equipment instance');
+            return;
+        }
+        console.log(id);
 
+        deleteArray.push(id);
+
+        console.log(deleteArray);
+
+        requestServices.updateEquipment(String(equipmentInfo?._id), token, undefined, {newIndividuals: undefined, removedIndividuals: deleteArray})
+            .then(() => {
+                setDeleteArray([]);
+                setUpdated(true);
+            })
+            .catch(e => {
+                console.log(e.message);
+                setDeleteArray([]);
+                setError('Something went wrong!');
+            });
     }
 
     return (
         <div className="container">
+            {deleted && <Navigate to={'/equipment'} replace={true}/>}
             <div className='row text-start'>
                 <Link to={'/equipment'}> <p>← Back to equipment list</p></Link>
             </div>
@@ -99,7 +138,7 @@ const EquipmentPage = () => {
                                        {showBookingForm ? <EquipmentBookingForm id={(item as IEquipmentChild)._id} setShowBookingForm={setShowBookingForm}/> : 
                                            <>
                                                <AdminButton buttonText='Bookings' buttonClass='btn-secondary' clickHandle={() => setShowBookingForm(true)} />
-                                               <AdminButton buttonText='Delete Instance' buttonClass='btn-danger' clickHandle={handleChildDelete} /> 
+                                               <AdminButton buttonText='Delete Instance' buttonClass='btn-danger' clickHandle={() => handleChildDelete((item as IEquipmentChild)._id)} /> 
                                            </>
                                        }
                                    </div>
