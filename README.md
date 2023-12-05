@@ -30,8 +30,9 @@ dbConnectors middleware:
 ## Files folder
 for correct saving and deleting of files, the following folder structure is required in /src:
 files
-      img
-      work-audio
+     |
+     |- img
+     |- work-audio
 
 ### Admin features
 - Add, edit and delete references
