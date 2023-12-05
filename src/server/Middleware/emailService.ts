@@ -4,6 +4,7 @@ import Mailjet from 'node-mailjet';
 dotenv.config();
 
 const adminEmail = process.env.MJ_ADMIN_DELIVERY_ADDRESS;
+const template = process.env.MJ_NOTIFICATION_TEMPLATE;
 
 const mailjet = new Mailjet({
     apiKey: process.env.MJ_APIKEY_PUBLIC || 'your-api-key',
@@ -25,7 +26,7 @@ async function sendFormDataEmail (formData: IFormData) {
                         'name': 'Portfolio Admin'
                     },
                     ],
-                    TemplateID:5311298,
+                    TemplateID:template,
                     TemplateLanguage: true,
                     Subject: 'Notification: New Inquiry Received',
                     Variables: {
